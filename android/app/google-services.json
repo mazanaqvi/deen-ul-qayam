@@ -1,40 +1,48 @@
 {
   "project_info": {
-    "project_number": "946063364931",
-    "project_id": "yourappname-9aca3",
-    "storage_bucket": "yourappname-9aca3.appspot.com"
+    "project_number": "1020835525565",
+    "project_id": "deenulqayyim-394d2",
+    "storage_bucket": "deenulqayyim-394d2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:946063364931:android:cd523b5793563a3257d5f6",
+        "mobilesdk_app_id": "1:1020835525565:android:3d12cd7c8342396e9c58d4",
         "android_client_info": {
-          "package_name": "com.example.yourappname"
+          "package_name": "com.jamia.deenulqayyim"
         }
       },
       "oauth_client": [
         {
-          "client_id": "946063364931-709266s19taopeuqpb2k16e72b5aar4h.apps.googleusercontent.com",
+          "client_id": "1020835525565-r9lbitmuu25fa6uoh77qipr4488k9rou.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jamia.deenulqayyim",
+            "certificate_hash": "c7ff38c59c90467d7e4af2b9ffa4440a905652dc"
+          }
+        },
+        {
+          "client_id": "1020835525565-4v8u5jo2lsd0p5rlusulog9iet5eit2d.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAORaonzstIpKxEcvdT14tr44nKnJzO0Co"
+          "current_key": "AIzaSyBP7mOGuno_Pn2zQhnYSe_t7QBaP62vFCo"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "946063364931-709266s19taopeuqpb2k16e72b5aar4h.apps.googleusercontent.com",
+              "client_id": "1020835525565-4v8u5jo2lsd0p5rlusulog9iet5eit2d.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "946063364931-55san9quqmqn89716spaku6sa381p4de.apps.googleusercontent.com",
+              "client_id": "1020835525565-f5ubu987m2ate6i2pclmnh89occolapo.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.iptv.ott"
+                "bundle_id": "com.example.yourappname"
               }
             }
           ]
