@@ -1,8 +1,8 @@
 class Constant {
   static const String baseurl = ' Add your Base URL here';
 
-  static String appName = "yourappname";
-  static String appPackageName = "com.example.yourappname";
+  static String appName = "DeenUlQayyim";
+  static String appPackageName = "com.jamia.deenulqayyim";
   static String chatAppName = "yourappname";
   static String appleAppId = "";
 
