@@ -409,49 +409,49 @@ class _SubscriptionState extends State<Subscription> {
                     multilanguage: false,
                   ),
                   const SizedBox(height: 15),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                      _checkAndPay(
-                          subscriptionProvider.packageList ?? [], index);
-                    },
-                    child: Container(
-                      width: 100,
-                      height: 40,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        color:
-                            (subscriptionProvider.packageList?[index].isBuy ==
-                                    1)
-                                ? colorAccent
-                                : colorPrimary,
-                      ),
-                      child: MyText(
-                        color:
-                            (subscriptionProvider.packageList?[index].isBuy ==
-                                    1)
-                                ? black
-                                : white,
-                        text: (subscriptionProvider.packageList?[index].isBuy ==
-                                1)
-                            ? "active"
-                            : "subscribe",
-                        maxline: 1,
-                        fontwaight:
-                            (subscriptionProvider.packageList?[index].isBuy ==
-                                    1)
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                        fontsizeNormal: Dimens.textSmall,
-                        fontsizeWeb: Dimens.textTitle,
-                        overflow: TextOverflow.ellipsis,
-                        textalign: TextAlign.center,
-                        fontstyle: FontStyle.normal,
-                        multilanguage: true,
-                      ),
-                    ),
-                  ),
+                  // InkWell(
+                  //   onTap: () {
+                  //     Navigator.pop(context);
+                  //     _checkAndPay(
+                  //         subscriptionProvider.packageList ?? [], index);
+                  //   },
+                  //   child: Container(
+                  //     width: 100,
+                  //     height: 40,
+                  //     alignment: Alignment.center,
+                  //     decoration: BoxDecoration(
+                  //       borderRadius: BorderRadius.circular(50),
+                  //       color:
+                  //           (subscriptionProvider.packageList?[index].isBuy ==
+                  //                   1)
+                  //               ? colorAccent
+                  //               : colorPrimary,
+                  //     ),
+                  //     child: MyText(
+                  //       color:
+                  //           (subscriptionProvider.packageList?[index].isBuy ==
+                  //                   1)
+                  //               ? black
+                  //               : white,
+                  //       text: (subscriptionProvider.packageList?[index].isBuy ==
+                  //               1)
+                  //           ? "active"
+                  //           : "subscribe",
+                  //       maxline: 1,
+                  //       fontwaight:
+                  //           (subscriptionProvider.packageList?[index].isBuy ==
+                  //                   1)
+                  //               ? FontWeight.w600
+                  //               : FontWeight.w500,
+                  //       fontsizeNormal: Dimens.textSmall,
+                  //       fontsizeWeb: Dimens.textTitle,
+                  //       overflow: TextOverflow.ellipsis,
+                  //       textalign: TextAlign.center,
+                  //       fontstyle: FontStyle.normal,
+                  //       multilanguage: true,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
