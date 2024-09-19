@@ -36,6 +36,9 @@ class LoginState extends State<Login> {
   String? userName;
   File? mProfileImg;
   String? strDeviceType, strDeviceToken;
+  bool showRegisterButton = false; 
+
+
 
   @override
   initState() {
@@ -89,6 +92,7 @@ class LoginState extends State<Login> {
                     topRight: Radius.circular(20),
                   ),
                 ),
+              
                 child: Column(
                   children: [
                     MyText(
@@ -108,7 +112,7 @@ class LoginState extends State<Login> {
                     const SizedBox(height: 25),
                     loginWithSocial(),
                     const SizedBox(height: 20),
-                    goingRegister(),
+                    if (showRegisterButton) goingRegister(), 
                   ],
                 ),
               ),
