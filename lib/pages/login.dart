@@ -399,77 +399,82 @@ class LoginState extends State<Login> {
   }
 
   Widget loginWithSocial() {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        InkWell(
-          onTap: (() {
-            gmailLogin();
-          }),
-          child: Container(
-            width: 50,
-            height: 50,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: gray.withOpacity(0.25),
-              shape: BoxShape.circle,
-            ),
-            child: MyImage(width: 20, height: 20, imagePath: "ic_gmail.png"),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
-          child: InkWell(
-            onTap: (() {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return const MobileLogin();
-                  },
-                ),
-              );
-            }),
-            child: Container(
-              width: 50,
-              height: 50,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: gray.withOpacity(0.25),
-                shape: BoxShape.circle,
-              ),
-              child: MyImage(
-                width: 20,
-                height: 20,
-                imagePath: "ic_mobile.png",
-                color: Theme.of(context).colorScheme.surface,
-              ),
-            ),
-          ),
-        ),
-        Platform.isIOS
-            ? Padding(
-                padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
-                child: InkWell(
-                  onTap: (() {
-                    printLog("clck");
-                    signInWithApple();
-                  }),
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: gray.withOpacity(0.25),
-                      shape: BoxShape.circle,
-                    ),
-                    child: MyImage(
-                        width: 20, height: 20, imagePath: "applestore.png"),
-                  ),
-                ),
-              )
-            : const SizedBox.shrink(),
+        // Hide Google Sign-In button
+        // InkWell(
+        //   onTap: (() {
+        //     gmailLogin();
+        //   }),
+        //   child: Container(
+        //     width: 50,
+        //     height: 50,
+        //     alignment: Alignment.center,
+        //     decoration: BoxDecoration(
+        //       color: gray.withOpacity(0.25),
+        //       shape: BoxShape.circle,
+        //     ),
+        //     child: MyImage(width: 20, height: 20, imagePath: "ic_gmail.png"),
+        //   ),
+        // ),
+
+        // Hide Mobile (OTP) Sign-In button
+        // Padding(
+        //   padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+        //   child: InkWell(
+        //     onTap: (() {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (context) {
+        //             return const MobileLogin();
+        //           },
+        //         ),
+        //       );
+        //     }),
+        //     child: Container(
+        //       width: 50,
+        //       height: 50,
+        //       alignment: Alignment.center,
+        //       decoration: BoxDecoration(
+        //         color: gray.withOpacity(0.25),
+        //         shape: BoxShape.circle,
+        //       ),
+        //       child: MyImage(
+        //         width: 20,
+        //         height: 20,
+        //         imagePath: "ic_mobile.png",
+        //         color: Theme.of(context).colorScheme.surface,
+        //       ),
+        //     ),
+        //   ),
+        // ),
+
+        // Hide Apple Sign-In button (only on iOS)
+        // Platform.isIOS
+        //     ? Padding(
+        //         padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+        //         child: InkWell(
+        //           onTap: (() {
+        //             printLog("clck");
+        //             signInWithApple();
+        //           }),
+        //           child: Container(
+        //             width: 50,
+        //             height: 50,
+        //             alignment: Alignment.center,
+        //             decoration: BoxDecoration(
+        //               color: gray.withOpacity(0.25),
+        //               shape: BoxShape.circle,
+        //             ),
+        //             child: MyImage(
+        //                 width: 20, height: 20, imagePath: "applestore.png"),
+        //           ),
+        //         ),
+        //       )
+        //     : const SizedBox.shrink(),
       ],
     );
   }
