@@ -1,9 +1,9 @@
 class Constant {
-  static const String baseurl = ' Add your Base URL here';
-
-  static String appName = "DeenUlQayyim";
+  static const String baseurl = "http://127.0.0.1:8000/api/"; 
+      
+  static String appName = "Qiyam";
   static String appPackageName = "com.jamia.deenulqayyim";
-  static String chatAppName = "yourappname";
+  static String chatAppName = "Deen Ul Qayyim";
   static String appleAppId = "";
 
   /* OneSignal App ID */

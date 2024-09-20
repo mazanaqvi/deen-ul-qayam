@@ -140,16 +140,16 @@ class BottombarState extends State<Bottombar> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            bottomNavigationItem(
-                icon: "ic_bottomNavhome.png",
-                title: Locales.string(context, "home"),
-                index: 0,
-                selectedIndex: selectedIndex),
-            bottomNavigationItem(
-                icon: "ic_bottomNavcategory.png",
-                title: Locales.string(context, "explore"),
-                index: 1,
-                selectedIndex: selectedIndex),
+            // bottomNavigationItem(
+            //     icon: "ic_bottomNavhome.png",
+            //     title: Locales.string(context, "home"),
+            //     index: 0,
+            //     selectedIndex: selectedIndex),
+            // bottomNavigationItem(
+            //     icon: "ic_bottomNavcategory.png",
+            //     title: Locales.string(context, "explore"),
+            //     index: 1,
+            //     selectedIndex: selectedIndex),
             bottomNavigationItem(
                 icon: "ic_mycourses.png",
                 title: Locales.string(context, "mycourse"),

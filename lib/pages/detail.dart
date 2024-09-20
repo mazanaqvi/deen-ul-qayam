@@ -618,7 +618,7 @@ class _DetailState extends State<Detail> {
             ),
           ],
         ),
-        const SizedBox(height: 15),
+        // const SizedBox(height: 15),
         // DetailVideo Title Text
         MyText(
             color: Theme.of(context).colorScheme.surface,
@@ -631,88 +631,61 @@ class _DetailState extends State<Detail> {
             overflow: TextOverflow.ellipsis,
             textalign: TextAlign.left,
             fontstyle: FontStyle.normal),
-        const SizedBox(height: 10),
+        // const SizedBox(height: 10),
 
-        //  Course Rating with Rating Count
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            MyRating(
-                rating: double.parse(
-                  detailProvider.courseDetailsModel.result?[0].avgRating
-                          .toString() ??
-                      "",
-                ),
-                spacing: 1,
-                size: 20),
-            const SizedBox(width: 10),
-            MyText(
-                color: colorAccent,
-                text:
-                    "${double.parse(detailProvider.courseDetailsModel.result?[0].avgRating.toString() ?? "")}",
-                fontsizeNormal: Dimens.textTitle,
-                fontwaight: FontWeight.w600,
-                maxline: 1,
-                overflow: TextOverflow.ellipsis,
-                textalign: TextAlign.left,
-                fontstyle: FontStyle.normal),
-          ],
-        ),
-        const SizedBox(height: 10),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            MyText(
-                color: gray,
-                text: Utils.kmbGenerator(
-                    (detailProvider.courseDetailsModel.result?[0].totalView ??
-                            0)
-                        .round()),
-                fontsizeNormal: Dimens.textSmall,
-                fontwaight: FontWeight.w400,
-                maxline: 1,
-                overflow: TextOverflow.ellipsis,
-                textalign: TextAlign.left,
-                fontstyle: FontStyle.normal),
-            const SizedBox(width: 5),
-            MyText(
-                color: gray,
-                text: "students",
-                fontsizeNormal: Dimens.textSmall,
-                fontwaight: FontWeight.w400,
-                maxline: 1,
-                overflow: TextOverflow.ellipsis,
-                textalign: TextAlign.left,
-                fontstyle: FontStyle.normal,
-                multilanguage: true),
-          ],
-        ),
-        const SizedBox(height: 10),
-        // Course Discription
-        ReadMoreText(
-          "${detailProvider.courseDetailsModel.result?[0].description.toString() ?? ""}  ",
-          trimLines: 5,
-          textAlign: TextAlign.left,
-          style: GoogleFonts.montserrat(
-              fontSize: Dimens.textSmall,
-              fontWeight: FontWeight.w400,
-              color: gray),
-          trimCollapsedText: 'Read More',
-          colorClickableText: black,
-          trimMode: TrimMode.Line,
-          trimExpandedText: 'Read less',
-          lessStyle: GoogleFonts.montserrat(
-              fontSize: Dimens.textSmall,
-              fontWeight: FontWeight.w600,
-              color: black),
-          moreStyle: GoogleFonts.montserrat(
-              fontSize: Dimens.textSmall,
-              fontWeight: FontWeight.w600,
-              color: black),
-        ),
+        // Text between students count and Created By
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.start,
+        //   crossAxisAlignment: CrossAxisAlignment.center,
+        //   children: [
+        //     // MyText(
+        //     //     color: gray,
+        //     //     text: Utils.kmbGenerator(
+        //     //         (detailProvider.courseDetailsModel.result?[0].totalView ??
+        //     //                 0)
+        //     //             .round()),
+        //     //     fontsizeNormal: Dimens.textSmall,
+        //     //     fontwaight: FontWeight.w400,
+        //     //     maxline: 1,
+        //     //     overflow: TextOverflow.ellipsis,
+        //     //     textalign: TextAlign.left,
+        //     //     fontstyle: FontStyle.normal),
+        //     // const SizedBox(width: 5),
+        //     // // MyText(
+        //     //     color: gray,
+        //     //     text: "students",
+        //     //     fontsizeNormal: Dimens.textSmall,
+        //     //     fontwaight: FontWeight.w400,
+        //     //     maxline: 1,
+        //     //     overflow: TextOverflow.ellipsis,
+        //     //     textalign: TextAlign.left,
+        //     //     fontstyle: FontStyle.normal,
+        //     //     multilanguage: true),
+        //   ],
+        // ),
+        // const SizedBox(height: 10),
+        // Course Description
+        // ReadMoreText(
+        //   "${detailProvider.courseDetailsModel.result?[0].description.toString() ?? ""}  ",
+        //   trimLines: 5,
+        //   textAlign: TextAlign.left,
+        //   style: GoogleFonts.montserrat(
+        //       fontSize: Dimens.textSmall,
+        //       fontWeight: FontWeight.w400,
+        //       color: gray),
+        //   trimCollapsedText: 'Read More',
+        //   colorClickableText: black,
+        //   trimMode: TrimMode.Line,
+        //   trimExpandedText: 'Read less',
+        //   lessStyle: GoogleFonts.montserrat(
+        //       fontSize: Dimens.textSmall,
+        //       fontWeight: FontWeight.w600,
+        //       color: black),
+        //   moreStyle: GoogleFonts.montserrat(
+        //       fontSize: Dimens.textSmall,
+        //       fontWeight: FontWeight.w600,
+        //       color: black),
+        // ),
 
         const SizedBox(height: 10),
 
@@ -788,104 +761,6 @@ class _DetailState extends State<Detail> {
           ],
         ),
         const SizedBox(height: 10),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                MyText(
-                    color: gray,
-                    text: "totalhours",
-                    fontsizeNormal: Dimens.textSmall,
-                    multilanguage: true,
-                    fontwaight: FontWeight.w500,
-                    maxline: 1,
-                    fontsizeWeb: Dimens.textSmall,
-                    overflow: TextOverflow.ellipsis,
-                    textalign: TextAlign.left,
-                    fontstyle: FontStyle.normal),
-                const SizedBox(width: 3),
-                MyText(
-                    color: gray,
-                    text: Utils.formatDuration(double.parse(detailProvider
-                            .courseDetailsModel.result?[0].totalDuration
-                            .toString() ??
-                        "")),
-                    fontsizeNormal: Dimens.textSmall,
-                    fontwaight: FontWeight.w500,
-                    maxline: 1,
-                    fontsizeWeb: Dimens.textSmall,
-                    overflow: TextOverflow.ellipsis,
-                    textalign: TextAlign.left,
-                    fontstyle: FontStyle.normal),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                MyText(
-                    color: gray,
-                    text: "update",
-                    multilanguage: true,
-                    fontsizeNormal: Dimens.textSmall,
-                    fontwaight: FontWeight.w500,
-                    maxline: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textalign: TextAlign.left,
-                    fontstyle: FontStyle.normal),
-                const SizedBox(width: 3),
-                MyText(
-                    color: gray,
-                    text: Utils.formateDate(
-                        detailProvider.courseDetailsModel.result?[0].updatedAt
-                                .toString() ??
-                            "",
-                        Constant.dateformat),
-                    fontsizeNormal: Dimens.textSmall,
-                    fontwaight: FontWeight.w500,
-                    maxline: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textalign: TextAlign.left,
-                    fontstyle: FontStyle.normal),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                MyText(
-                    color: gray,
-                    text: "language",
-                    multilanguage: true,
-                    fontsizeNormal: Dimens.textSmall,
-                    fontwaight: FontWeight.w500,
-                    maxline: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textalign: TextAlign.left,
-                    fontstyle: FontStyle.normal),
-                const SizedBox(width: 3),
-                MyText(
-                    color: gray,
-                    text: detailProvider
-                            .courseDetailsModel.result?[0].languageName
-                            .toString() ??
-                        "",
-                    fontsizeNormal: Dimens.textSmall,
-                    fontwaight: FontWeight.w500,
-                    maxline: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textalign: TextAlign.left,
-                    fontstyle: FontStyle.normal),
-              ],
-            ),
-          ],
-        ),
       ],
     );
   }
@@ -898,14 +773,14 @@ class _DetailState extends State<Detail> {
         padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
         child: Column(
           children: [
-            courseInclude(),
-            const SizedBox(height: 15),
-            whatYouLearn(),
-            const SizedBox(height: 15),
-            requirementBox(),
-            const SizedBox(height: 15),
-            discription(),
-            const SizedBox(height: 15),
+            // courseInclude(),
+            // const SizedBox(height: 15),
+            // whatYouLearn(),
+            // const SizedBox(height: 15),
+            // requirementBox(),
+            // const SizedBox(height: 15),
+            // description(),
+            // const SizedBox(height: 15),
             relatedCourse(),
             const SizedBox(height: 15),
             courseEpisodes(),
@@ -956,7 +831,7 @@ class _DetailState extends State<Detail> {
             width: 100,
           ),
           const SizedBox(height: 10),
-          // Course Discription
+          // Course Description
           CustomWidget.roundrectborder(
             height: 5,
             width: MediaQuery.of(context).size.width,
@@ -1049,278 +924,62 @@ class _DetailState extends State<Detail> {
     );
   }
 
-/* This Course Include */
+/* Description */
 
-  Widget courseInclude() {
-    if (detailProvider.courseDetailsModel.result?[0].inlcude != null &&
-        (detailProvider.courseDetailsModel.result?[0].inlcude?.length ?? 0) >
-            0) {
-      return Container(
-        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-        decoration: BoxDecoration(
-          color: colorPrimary.withOpacity(0.10),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(10.0),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            MyText(
-                color: Theme.of(context).colorScheme.surface,
-                fontwaight: FontWeight.w600,
-                fontsizeNormal: Dimens.textTitle,
-                overflow: TextOverflow.ellipsis,
-                maxline: 1,
-                text: "thiscouurseincludes",
-                textalign: TextAlign.center,
-                fontstyle: FontStyle.normal,
-                multilanguage: true),
-            const SizedBox(height: 20),
-            ListView.separated(
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: detailProvider
-                      .courseDetailsModel.result?[0].inlcude?.length ??
-                  0,
-              itemBuilder: (BuildContext context, int index) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    MyImage(
-                      width: 15,
-                      height: 15,
-                      imagePath: "ic_tick.png",
-                      color: colorPrimary,
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: MyText(
-                          color: gray,
-                          fontwaight: FontWeight.w400,
-                          fontsizeNormal: Dimens.textSmall,
-                          overflow: TextOverflow.ellipsis,
-                          maxline: 2,
-                          text: detailProvider.courseDetailsModel.result?[0]
-                                  .inlcude?[index].title
-                                  .toString() ??
-                              "",
-                          textalign: TextAlign.left,
-                          fontstyle: FontStyle.normal),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
-
-/* What You Learn */
-
-  Widget whatYouLearn() {
-    if (detailProvider.courseDetailsModel.result?[0].whatYouLearn != null &&
-        (detailProvider.courseDetailsModel.result?[0].whatYouLearn?.length ??
-                0) >
-            0) {
-      return Container(
-        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-        decoration: BoxDecoration(
-          color: colorPrimary.withOpacity(0.10),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(10.0),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            MyText(
-                color: Theme.of(context).colorScheme.surface,
-                fontwaight: FontWeight.w600,
-                fontsizeNormal: Dimens.textTitle,
-                overflow: TextOverflow.ellipsis,
-                maxline: 1,
-                text: "whatyoulearn",
-                textalign: TextAlign.left,
-                fontstyle: FontStyle.normal,
-                multilanguage: true),
-            const SizedBox(height: 20),
-            ListView.separated(
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: detailProvider
-                      .courseDetailsModel.result?[0].whatYouLearn?.length ??
-                  0,
-              itemBuilder: (BuildContext context, int index) {
-                return Row(
-                  children: [
-                    MyImage(
-                      width: 15,
-                      height: 15,
-                      imagePath: "ic_tick.png",
-                      color: colorPrimary,
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: MyText(
-                          color: gray,
-                          fontwaight: FontWeight.w400,
-                          fontsizeNormal: Dimens.textSmall,
-                          overflow: TextOverflow.ellipsis,
-                          maxline: 3,
-                          text: detailProvider.courseDetailsModel.result?[0]
-                                  .whatYouLearn?[index].title
-                                  .toString() ??
-                              "",
-                          textalign: TextAlign.left,
-                          fontstyle: FontStyle.normal),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
-
-/* Requirmemt Box */
-
-  Widget requirementBox() {
-    if (detailProvider.courseDetailsModel.result![0].requrirment != null &&
-        (detailProvider.courseDetailsModel.result![0].requrirment?.length ??
-                0) >
-            0) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MyText(
-              color: Theme.of(context).colorScheme.surface,
-              fontwaight: FontWeight.w600,
-              fontsizeNormal: Dimens.textTitle,
-              overflow: TextOverflow.ellipsis,
-              maxline: 1,
-              text: "requirments",
-              textalign: TextAlign.center,
-              fontstyle: FontStyle.normal,
-              multilanguage: true),
-          const SizedBox(height: 15),
-          ListView.separated(
-            separatorBuilder: (context, index) => const SizedBox(height: 10),
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: detailProvider
-                    .courseDetailsModel.result?[0].requrirment?.length ??
-                0,
-            itemBuilder: (BuildContext context, int index) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  MyImage(
-                    width: 15,
-                    height: 15,
-                    imagePath: "ic_tick.png",
-                    color: colorPrimary,
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: MyText(
-                        color: gray,
-                        fontwaight: FontWeight.w400,
-                        fontsizeNormal: Dimens.textSmall,
-                        overflow: TextOverflow.ellipsis,
-                        maxline: 3,
-                        text: detailProvider.courseDetailsModel.result?[0]
-                                .requrirment?[index].title
-                                .toString() ??
-                            "",
-                        textalign: TextAlign.left,
-                        fontstyle: FontStyle.normal),
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
-
-/* Discription */
-
-  Widget discription() {
-    if (detailProvider.courseDetailsModel.result?[0].description != "") {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MyText(
-              color: Theme.of(context).colorScheme.surface,
-              fontwaight: FontWeight.w600,
-              fontsizeNormal: Dimens.textTitle,
-              overflow: TextOverflow.ellipsis,
-              maxline: 1,
-              text: "description",
-              textalign: TextAlign.center,
-              fontstyle: FontStyle.normal,
-              multilanguage: true),
-          const SizedBox(height: 10),
-          ReadMoreText(
-            "${detailProvider.courseDetailsModel.result?[0].description.toString() ?? ""}  ",
-            trimLines: 5,
-            textAlign: TextAlign.left,
-            style: GoogleFonts.montserrat(
-                fontSize: Dimens.textSmall,
-                fontWeight: FontWeight.w400,
-                color: gray),
-            trimCollapsedText: 'Read More',
-            colorClickableText: colorPrimary,
-            trimMode: TrimMode.Line,
-            trimExpandedText: 'Read less',
-            lessStyle: GoogleFonts.montserrat(
-                fontSize: Dimens.textSmall,
-                fontWeight: FontWeight.w600,
-                color: colorPrimary),
-            moreStyle: GoogleFonts.montserrat(
-                fontSize: Dimens.textSmall,
-                fontWeight: FontWeight.w600,
-                color: colorPrimary),
-          ),
-          // MyText(
-          //     color: gray,
-          //     fontsizeNormal: Dimens.textSmall,
-          //     text: detailProvider.courseDetailsModel.result?[0].description
-          //             .toString() ??
-          //         "",
-          //     maxline: 5,
-          //     fontwaight: FontWeight.w400,
-          //     textalign: TextAlign.left,
-          //     fontstyle: FontStyle.normal),
-        ],
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
+  // Widget description() {
+  //   if (detailProvider.courseDetailsModel.result?[0].description != "") {
+  //     return Column(
+  //       mainAxisAlignment: MainAxisAlignment.start,
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         MyText(
+  //             color: Theme.of(context).colorScheme.surface,
+  //             fontwaight: FontWeight.w600,
+  //             fontsizeNormal: Dimens.textTitle,
+  //             overflow: TextOverflow.ellipsis,
+  //             maxline: 1,
+  //             text: "description",
+  //             textalign: TextAlign.center,
+  //             fontstyle: FontStyle.normal,
+  //             multilanguage: true),
+  //         const SizedBox(height: 10),
+  //         ReadMoreText(
+  //           "${detailProvider.courseDetailsModel.result?[0].description.toString() ?? ""}  ",
+  //           trimLines: 5,
+  //           textAlign: TextAlign.left,
+  //           style: GoogleFonts.montserrat(
+  //               fontSize: Dimens.textSmall,
+  //               fontWeight: FontWeight.w400,
+  //               color: gray),
+  //           trimCollapsedText: 'Read More',
+  //           colorClickableText: colorPrimary,
+  //           trimMode: TrimMode.Line,
+  //           trimExpandedText: 'Read less',
+  //           lessStyle: GoogleFonts.montserrat(
+  //               fontSize: Dimens.textSmall,
+  //               fontWeight: FontWeight.w600,
+  //               color: colorPrimary),
+  //           moreStyle: GoogleFonts.montserrat(
+  //               fontSize: Dimens.textSmall,
+  //               fontWeight: FontWeight.w600,
+  //               color: colorPrimary),
+  //         ),
+  //         // MyText(
+  //         //     color: gray,
+  //         //     fontsizeNormal: Dimens.textSmall,
+  //         //     text: detailProvider.courseDetailsModel.result?[0].description
+  //         //             .toString() ??
+  //         //         "",
+  //         //     maxline: 5,
+  //         //     fontwaight: FontWeight.w400,
+  //         //     textalign: TextAlign.left,
+  //         //     fontstyle: FontStyle.normal),
+  //       ],
+  //     );
+  //   } else {
+  //     return const SizedBox.shrink();
+  //   }
+  // }
 
 /* Related Course */
 
@@ -1541,7 +1200,7 @@ class _DetailState extends State<Detail> {
         children: [
           MyText(
               color: Theme.of(context).colorScheme.surface,
-              text: "curriculim",
+              text: "Curriculum",
               fontsizeNormal: Dimens.textTitle,
               fontwaight: FontWeight.w600,
               maxline: 1,

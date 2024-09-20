@@ -48,9 +48,16 @@ Future<void> main() async {
   if (!kIsWeb) {
     await FlutterDownloader.initialize();
   }
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-/* Initialize Hive Start */
+  // Check if Firebase has already been initialized
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      name: 'Deen-Al-Qayam', // Add your project name here
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  /* Initialize Hive Start */
   if (!kIsWeb) {
     final appDocumentDir = await getApplicationDocumentsDirectory();
     Hive.init(appDocumentDir.path);
@@ -58,7 +65,7 @@ Future<void> main() async {
     Hive.registerAdapter(ChapterItemAdapter());
     Hive.registerAdapter(EpisodeItemAdapter());
   }
-/* Initialize Hive End */
+  /* Initialize Hive End */
 
   await Locales.init(['en', 'ar', 'hi']);
 
