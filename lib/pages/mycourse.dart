@@ -352,10 +352,6 @@ class MyCourseState extends State<MyCourse> {
                               //   ],
                               // ),
                               // Hiding the Download Certificate Option
-                              // generateCertificate(myCourseProvider
-                              //         .mycourseList?[index].id
-                              //         .toString() ??
-                              //     ""),
                             ],
                           ),
                         ),
