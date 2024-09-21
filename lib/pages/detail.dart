@@ -784,7 +784,8 @@ class _DetailState extends State<Detail> {
             relatedCourse(),
             const SizedBox(height: 15),
             courseEpisodes(),
-            generateCertificate(),
+            // Hiding the certificate in the general certificate page
+            // generateCertificate(),
             const SizedBox(height: 20),
             buildStudentFeedback(),
           ],
