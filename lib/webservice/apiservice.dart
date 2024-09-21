@@ -75,41 +75,103 @@ class ApiService {
   /* General APi Start */
 
   Future<GeneralSettingModel> genaralSetting() async {
-    GeneralSettingModel generalSettingModel;
-    String apiname = "general_setting";
-    dio.interceptors.add(LogInterceptor(
-      responseBody: true,
-    )); // Add this line before making the API call
-
-    try {
-      Response response = await dio.post('$baseUrl$apiname');
-      if (response.statusCode == 200) {
-        // Parse the result from the response
-        generalSettingModel = GeneralSettingModel.fromJson(response.data);
-
-        // Pretty print the response using jsonEncode with indentation
-        final prettyResponse =
-            JsonEncoder.withIndent('  ').convert(response.data);
-        print('General settings fetched successfully:\n$prettyResponse');
-
-        return generalSettingModel;
-      } else {
-        print('Error: ${response.statusCode}');
-        throw Exception("Failed to fetch general settings");
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Get Record Successfully",
+    "result": [
+      {
+        "id": 1,
+        "key": "app_name",
+        "value": "DTLearning"
+      },
+      {
+        "id": 2,
+        "key": "host_email",
+        "value": "admin@admin.com"
+      },
+      {
+        "id": 3,
+        "key": "app_version",
+        "value": "1.0"
+      },
+      {
+        "id": 4,
+        "key": "author",
+        "value": "Admin"
+      },
+      {
+        "id": 5,
+        "key": "email",
+        "value": "admin@admin.com"
+      },
+      {
+        "id": 6,
+        "key": "contact",
+        "value": "1020304050"
+      },
+      {
+        "id": 7,
+        "key": "app_description",
+        "value": "DivineTechs, a top web & mobile app development company offering innovative solutions for diverse industry verticals.\\r\\nWe have a creative and dedicated group of developers who are mastered in Apps Development and Web Development with expertise in delivering quality solutions to customers across the globe."
       }
-    } catch (e) {
-      print("Dio error: $e");
-      throw Exception("Failed to fetch general settings");
-    }
+    ]
   }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    GeneralSettingModel generalSettingModel =
+        GeneralSettingModel.fromJson(jsonResponse);
+
+    final prettyResponse = JsonEncoder.withIndent('  ').convert(jsonResponse);
+    print('General settings fetched successfully:\n$prettyResponse');
+
+    return generalSettingModel;
+  }
+  
 
   Future<IntroScreenModel> getOnboardingScreen() async {
-    IntroScreenModel introScreenModel;
-    String apiName = "get_onboarding_screen";
-    Response response = await dio.post(
-      '$baseUrl$apiName',
-    );
-    introScreenModel = IntroScreenModel.fromJson(response.data);
+    // Hardcoded response as a JSON-like structure
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Onboarding screens fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "title": "Welcome to Our App",
+        "image": "https://example.com/welcome_image.png",
+        "status": 1,
+        "created_at": "2024-09-01 12:00:00",
+        "updated_at": "2024-09-15 12:00:00"
+      },
+      {
+        "id": 2,
+        "title": "Learn and Grow",
+        "image": "https://example.com/learn_image.png",
+        "status": 1,
+        "created_at": "2024-09-02 12:00:00",
+        "updated_at": "2024-09-15 12:00:00"
+      },
+      {
+        "id": 3,
+        "title": "Achieve Your Goals",
+        "image": "https://example.com/goals_image.png",
+        "status": 1,
+        "created_at": "2024-09-03 12:00:00",
+        "updated_at": "2024-09-15 12:00:00"
+      }
+    ]
+  }
+  ''';
+
+    // Parse the hardcoded response into the IntroScreenModel
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    IntroScreenModel introScreenModel = IntroScreenModel.fromJson(jsonResponse);
+
+    // Log the response for debugging purposes
+    print('Hardcoded API Response for getOnboardingScreen: $jsonResponse');
+
     return introScreenModel;
   }
 
@@ -194,22 +256,31 @@ class ApiService {
 
   Future<Updateprofilemodel> updateprofile(fullname, mobilenumber, email,
       countryCode, countryName, File imagefile) async {
-    Updateprofilemodel updateprofilemodel;
-    String updateprofile = "update_profile";
-    Response response = await dio.post('$baseUrl$updateprofile',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'full_name': fullname,
-          'email': email,
-          'mobile_number': mobilenumber,
-          'country_code': countryCode,
-          'country_name': countryName,
-          if (imagefile.path != "")
-            'image': await MultipartFile.fromFile(imagefile.path,
-                filename: basename(imagefile.path)),
-        }));
+    // Hardcoded update profile response
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Profile updated successfully"
+  }
+  ''';
 
-    updateprofilemodel = Updateprofilemodel.fromJson(response.data);
+    // Log the input parameters for debugging
+    print('Updating profile with the following details:');
+    print('Full Name: $fullname');
+    print('Mobile Number: $mobilenumber');
+    print('Email: $email');
+    print('Country Code: $countryCode');
+    print('Country Name: $countryName');
+    print('Image File: ${imagefile.path}');
+
+    // Parse the hardcoded response into Updateprofilemodel
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Updateprofilemodel updateprofilemodel =
+        Updateprofilemodel.fromJson(jsonResponse);
+
+    // Log the hardcoded response for debugging
+    print('Hardcoded Response for Update Profile: $jsonResponse');
+
     return updateprofilemodel;
   }
 
@@ -416,118 +487,119 @@ class ApiService {
 /* Video By Category & Language */
 
   Future<VideobyIdModel> getContentbyCategoryId(categoryId, pageNo) async {
-  // Create a variable to store the hardcoded response based on the courseId and chapterId
-  var hardcodedVideoByChapterResponse;
+    // Create a variable to store the hardcoded response based on the courseId and chapterId
+    var hardcodedVideoByChapterResponse;
 
-  // Condition to return different content based on the courseId or chapterId
-  if (categoryId == 10) {
-    // Content for the Flutter course (categoryId = 10)
-    hardcodedVideoByChapterResponse = {
-      "status": 200,
-      "message": "Success",
-      "result": [
-        {
-          "id": 1,
-          "course_id": categoryId,
-          "chapter_id": 1,
-          "title": "Flutter - Introduction",
-          "thumbnail_img": "https://example.com/flutter_thumbnail1.jpg",
-          "landscape_img": "https://example.com/flutter_landscape1.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 600,
-          "description": "Introduction to Flutter Development.",
-          "total_view": 1500,
-          "status": 1,
-          "created_at": "2024-09-15",
-          "updated_at": "2024-09-16",
-          "is_buy": 1,
-          "is_read": 1
-        },
-        {
-          "id": 2,
-          "course_id": categoryId,
-          "chapter_id": 2,
-          "title": "Flutter - Widgets",
-          "thumbnail_img": "https://example.com/flutter_thumbnail2.jpg",
-          "landscape_img": "https://example.com/flutter_landscape2.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 900,
-          "description": "Introduction to Widgets in Flutter.",
-          "total_view": 1000,
-          "status": 1,
-          "created_at": "2024-09-15",
-          "updated_at": "2024-09-16",
-          "is_buy": 1,
-          "is_read": 1
-        }
-      ],
-      "total_rows": 2,
-      "total_page": 1,
-      "current_page": 1,
-      "more_page": false
-    };
-  } else if (categoryId == 15) {
-    // Content for the Data Science course (categoryId = 15)
-    hardcodedVideoByChapterResponse = {
-      "status": 200,
-      "message": "Success",
-      "result": [
-        {
-          "id": 1,
-          "course_id": categoryId,
-          "chapter_id": 1,
-          "title": "Data Science - Python Introduction",
-          "thumbnail_img": "https://example.com/python_thumbnail1.jpg",
-          "landscape_img": "https://example.com/python_landscape1.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 1200,
-          "description": "Introduction to Data Science using Python.",
-          "total_view": 2300,
-          "status": 1,
-          "created_at": "2024-08-01",
-          "updated_at": "2024-09-18",
-          "is_buy": 1,
-          "is_read": 1
-        },
-        {
-          "id": 2,
-          "course_id": categoryId,
-          "chapter_id": 2,
-          "title": "Data Science - Pandas Overview",
-          "thumbnail_img": "https://example.com/python_thumbnail2.jpg",
-          "landscape_img": "https://example.com/python_landscape2.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 1500,
-          "description": "Learn how to use Pandas for Data Science.",
-          "total_view": 2000,
-          "status": 1,
-          "created_at": "2024-08-01",
-          "updated_at": "2024-09-18",
-          "is_buy": 0,
-          "is_read": 1
-        }
-      ],
-      "total_rows": 2,
-      "total_page": 1,
-      "current_page": 1,
-      "more_page": false
-    };
+    // Condition to return different content based on the courseId or chapterId
+    if (categoryId == 10) {
+      // Content for the Flutter course (categoryId = 10)
+      hardcodedVideoByChapterResponse = {
+        "status": 200,
+        "message": "Success",
+        "result": [
+          {
+            "id": 1,
+            "course_id": categoryId,
+            "chapter_id": 1,
+            "title": "Flutter - Introduction",
+            "thumbnail_img": "https://example.com/flutter_thumbnail1.jpg",
+            "landscape_img": "https://example.com/flutter_landscape1.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 600,
+            "description": "Introduction to Flutter Development.",
+            "total_view": 1500,
+            "status": 1,
+            "created_at": "2024-09-15",
+            "updated_at": "2024-09-16",
+            "is_buy": 1,
+            "is_read": 1
+          },
+          {
+            "id": 2,
+            "course_id": categoryId,
+            "chapter_id": 2,
+            "title": "Flutter - Widgets",
+            "thumbnail_img": "https://example.com/flutter_thumbnail2.jpg",
+            "landscape_img": "https://example.com/flutter_landscape2.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 900,
+            "description": "Introduction to Widgets in Flutter.",
+            "total_view": 1000,
+            "status": 1,
+            "created_at": "2024-09-15",
+            "updated_at": "2024-09-16",
+            "is_buy": 1,
+            "is_read": 1
+          }
+        ],
+        "total_rows": 2,
+        "total_page": 1,
+        "current_page": 1,
+        "more_page": false
+      };
+    } else if (categoryId == 15) {
+      // Content for the Data Science course (categoryId = 15)
+      hardcodedVideoByChapterResponse = {
+        "status": 200,
+        "message": "Success",
+        "result": [
+          {
+            "id": 1,
+            "course_id": categoryId,
+            "chapter_id": 1,
+            "title": "Data Science - Python Introduction",
+            "thumbnail_img": "https://example.com/python_thumbnail1.jpg",
+            "landscape_img": "https://example.com/python_landscape1.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 1200,
+            "description": "Introduction to Data Science using Python.",
+            "total_view": 2300,
+            "status": 1,
+            "created_at": "2024-08-01",
+            "updated_at": "2024-09-18",
+            "is_buy": 1,
+            "is_read": 1
+          },
+          {
+            "id": 2,
+            "course_id": categoryId,
+            "chapter_id": 2,
+            "title": "Data Science - Pandas Overview",
+            "thumbnail_img": "https://example.com/python_thumbnail2.jpg",
+            "landscape_img": "https://example.com/python_landscape2.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 1500,
+            "description": "Learn how to use Pandas for Data Science.",
+            "total_view": 2000,
+            "status": 1,
+            "created_at": "2024-08-01",
+            "updated_at": "2024-09-18",
+            "is_buy": 0,
+            "is_read": 1
+          }
+        ],
+        "total_rows": 2,
+        "total_page": 1,
+        "current_page": 1,
+        "more_page": false
+      };
+    }
+
+    // Parse the hardcoded response into VideobyIdModel
+    final jsonResponse =
+        jsonDecode(jsonEncode(hardcodedVideoByChapterResponse));
+    VideobyIdModel videobyIdModel = VideobyIdModel.fromJson(jsonResponse);
+
+    return videobyIdModel;
   }
-
-  // Parse the hardcoded response into VideobyIdModel
-  final jsonResponse = jsonDecode(jsonEncode(hardcodedVideoByChapterResponse));
-  VideobyIdModel videobyIdModel = VideobyIdModel.fromJson(jsonResponse);
-
-  return videobyIdModel;
-}
 
   Future<VideobyIdModel> getContentbyLanguageId(languageId, pageNo) async {
     VideobyIdModel videobyIdModel;
@@ -711,7 +783,6 @@ class ApiService {
     // Condition to return different content based on the courseId or chapterId
     if (int.parse(courseId.toString()) == 1 &&
         int.parse(chapterId.toString()) == 1) {
-
       print('DEBUG: Returning content for Course 1, Chapter 1');
 
       hardcodedVideoByChapterResponse = {
