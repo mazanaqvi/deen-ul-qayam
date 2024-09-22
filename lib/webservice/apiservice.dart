@@ -131,7 +131,6 @@ class ApiService {
   
 
   Future<IntroScreenModel> getOnboardingScreen() async {
-    // Hardcoded response as a JSON-like structure
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -165,11 +164,9 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into the IntroScreenModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     IntroScreenModel introScreenModel = IntroScreenModel.fromJson(jsonResponse);
 
-    // Log the response for debugging purposes
     print('Hardcoded API Response for getOnboardingScreen: $jsonResponse');
 
     return introScreenModel;
@@ -177,24 +174,41 @@ class ApiService {
 
   Future<Loginmodel> login(type, number, email, password, deviceType,
       deviceToken, firebaseId, countryCode, countryName) async {
-    Loginmodel loginModel;
-    String login = "login";
-    Response response = await dio.post('$baseUrl$login',
-        data: FormData.fromMap({
-          'type': type,
-          'mobile_number': number,
-          'email': email,
-          'password': password,
-          'device_type': deviceType,
-          'device_token': deviceToken,
-          'firebase_id': firebaseId,
-          'country_code': countryCode,
-          'country_name': countryName,
-        }));
+    final hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Login successful",
+    "result": [
+      {
+        "id": 1,
+        "firebase_id": "$firebaseId",
+        "user_name": "Essa",
+        "full_name": "Essa Arshad",
+        "email": "$email",
+        "password": "$password",
+        "mobile_number": "$number",
+        "type": $type,
+        "image": "https://example.com/profile_image.jpg",
+        "bio": "This is a hardcoded bio.",
+        "device_type": $deviceType,
+        "device_token": "$deviceToken",
+        "pratice_quiz_score": 100,
+        "status": 1,
+        "created_at": "2024-09-20 12:00:00",
+        "updated_at": "2024-09-20 12:30:00",
+        "is_buy": 0
+      }
+    ]
+  }
+  ''';
 
-    loginModel = Loginmodel.fromJson(response.data);
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Loginmodel loginModel = Loginmodel.fromJson(jsonResponse);
+
     return loginModel;
   }
+
+
 
   Future<Registermodel> register(
       fullname, email, number, password, countryCode, countryName) async {
@@ -214,7 +228,6 @@ class ApiService {
   }
 
   Future<ProfileModel> profile() async {
-    // Hardcoded profile response
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -247,7 +260,6 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into ProfileModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     ProfileModel profileModel = ProfileModel.fromJson(jsonResponse);
 
@@ -256,7 +268,6 @@ class ApiService {
 
   Future<Updateprofilemodel> updateprofile(fullname, mobilenumber, email,
     countryCode, countryName, File imagefile) async {
-  // Hardcoded update profile response
   const hardcodedResponse = '''
   {
     "status": 200,
@@ -264,7 +275,6 @@ class ApiService {
   }
   ''';
 
-  // Log the input parameters for debugging
   print('Updating profile with the following details:');
   print('Full Name: $fullname');
   print('Mobile Number: $mobilenumber');
@@ -273,11 +283,9 @@ class ApiService {
   print('Country Name: $countryName');
   print('Image File: ${imagefile.path}');
 
-  // Parse the hardcoded response into Updateprofilemodel
   final jsonResponse = jsonDecode(hardcodedResponse);
   Updateprofilemodel updateprofilemodel = Updateprofilemodel.fromJson(jsonResponse);
 
-  // Log the hardcoded response for debugging
   print('Hardcoded Response for Update Profile: $jsonResponse');
 
   return updateprofilemodel;
@@ -297,15 +305,41 @@ class ApiService {
   }
 
   Future<GetPageModel> getpage() async {
-    GetPageModel getPageModel;
-    String apiname = "get_pages";
-    Response response = await dio.post('$baseUrl$apiname');
-    getPageModel = GetPageModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Pages fetched successfully",
+    "result": [
+      {
+        "page_name": "About Us",
+        "title": "Learn more about us",
+        "url": "https://example.com/about",
+        "icon": "https://example.com/icons/about_icon.png"
+      },
+      {
+        "page_name": "Contact Us",
+        "title": "Get in touch with us",
+        "url": "https://example.com/contact",
+        "icon": "https://example.com/icons/contact_icon.png"
+      },
+      {
+        "page_name": "Privacy Policy",
+        "title": "Read our privacy policy",
+        "url": "https://example.com/privacy",
+        "icon": "https://example.com/icons/privacy_icon.png"
+      }
+    ]
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    GetPageModel getPageModel = GetPageModel.fromJson(jsonResponse);
+
     return getPageModel;
   }
 
+
   Future<SocialLinkModel> getSocialLink() async {
-    // Hardcoded JSON response
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -333,7 +367,6 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into SocialLinkModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     SocialLinkModel socialLinkModel = SocialLinkModel.fromJson(jsonResponse);
 
@@ -368,7 +401,6 @@ class ApiService {
   }
 
   Future<CategoryModel> category(pageNo) async {
-    // Hardcoded category response
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -406,7 +438,6 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into CategoryModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     CategoryModel categoryModel = CategoryModel.fromJson(jsonResponse);
 
@@ -415,7 +446,6 @@ class ApiService {
 
 
   Future<MyCourseModel> mycourse(pageno) async {
-    // Hardcoded JSON response
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -703,7 +733,6 @@ class ApiService {
   /* Detail Page All Api's Start */
 
   Future<CourseDetailsModel> courseDetail(courseId) async {
-    // Create a hardcoded response matching the structure of CourseDetailsModel
     var hardcodedResponse = {
       "status": 200,
       "message": "Success",
@@ -805,7 +834,6 @@ class ApiService {
   }
 
   Future<GetCourseReviewModel> courseReviewList(type, contentId, pageNo) async {
-    // Hardcoded response for course review list
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -847,7 +875,6 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into GetCourseReviewModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     GetCourseReviewModel getCourseReviewModel =
         GetCourseReviewModel.fromJson(jsonResponse);
@@ -872,7 +899,6 @@ class ApiService {
   }
 
   Future<SuccessModel> addVideoRead(courseId, videoId, chapterId) async {
-    // Hardcoded response for add video read
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -881,7 +907,6 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into SuccessModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     SuccessModel successVideoReadModel = SuccessModel.fromJson(jsonResponse);
 
@@ -1048,7 +1073,6 @@ class ApiService {
     print(
         'DEBUG: Hardcoded response before sanitization: $hardcodedVideoByChapterResponse');
 
-    // Sanitize the result to ensure types are correct
     List<Map<String, dynamic>> sanitizedResults =
         (hardcodedVideoByChapterResponse["result"] as List).map((video) {
       return {
@@ -1102,7 +1126,6 @@ class ApiService {
   }
 
   Future<CertificateModel> fetchCertificate(courseId) async {
-    // Hardcoded response for fetching certificate
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -1113,7 +1136,6 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into CertificateModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     CertificateModel certificateModel = CertificateModel.fromJson(jsonResponse);
 
@@ -1125,28 +1147,82 @@ class ApiService {
   /* (Wishlist Api Start) */
 
   Future<Wishlistmodel> wishlist(type, pageno) async {
-    Wishlistmodel wishlistmodel;
-    String apiname = "get_wishlist_content";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'type': type,
-          'page_no': pageno,
-        }));
-    wishlistmodel = Wishlistmodel.fromJson(response.data);
-    return wishlistmodel;
+  const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Wishlist fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 123,
+        "category_id": 5,
+        "language_id": 1,
+        "title": "Flutter Development",
+        "description": "Learn how to develop apps with Flutter.",
+        "thumbnail_img": "https://example.com/flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "total_view": 2000,
+        "status": 1,
+        "created_at": "2024-01-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 0,
+        "is_user_buy": 0,
+        "avg_rating": "4.5"
+      },
+      {
+        "id": 2,
+        "tutor_id": 456,
+        "category_id": 6,
+        "language_id": 2,
+        "title": "Advanced Python",
+        "description": "Deep dive into Python programming.",
+        "thumbnail_img": "https://example.com/python_thumbnail.jpg",
+        "landscape_img": "https://example.com/python_landscape.jpg",
+        "is_free": 0,
+        "price": 50,
+        "total_view": 5000,
+        "status": 1,
+        "created_at": "2024-03-01",
+        "updated_at": "2024-09-20",
+        "category_name": "Programming",
+        "language_name": "Spanish",
+        "tutor_name": "Jane Smith",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.8"
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
   }
+  ''';
+
+  final jsonResponse = jsonDecode(hardcodedResponse);
+  Wishlistmodel wishlistmodel = Wishlistmodel.fromJson(jsonResponse);
+
+  return wishlistmodel;
+}
+
 
   Future<SuccessModel> addRemoveWishlist(type, contentId) async {
-    SuccessModel successModel;
-    String apiname = "add_remove_wishlist";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'type': type,
-          'content_id': contentId,
-        }));
-    successModel = SuccessModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Wishlist action successful",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    SuccessModel successModel = SuccessModel.fromJson(jsonResponse);
+
     return successModel;
   }
 
@@ -1325,7 +1401,7 @@ class ApiService {
     return saveQuestionReportModel;
   }
 
-/* Quize Api End */
+/* Quiz Api End */
 
   Future<SuccessModel> becomeTutor(
       String username,
@@ -1402,40 +1478,194 @@ class ApiService {
 /* Books Related APi Start */
 
   Future<EbookModel> bookList(pageNo) async {
-    EbookModel getEbookModel;
-    String apiname = "get_latest_book";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'page_no': pageNo,
-        }));
-    getEbookModel = EbookModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Books fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 101,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Learn Flutter",
+        "book_url": "https://example.com/flutter_book.pdf",
+        "thumbnail_img": "https://example.com/flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "description": "This book covers Flutter basics.",
+        "summary": "Learn how to build cross-platform mobile apps using Flutter.",
+        "specification": "PDF, 150 pages",
+        "total_view": 1500,
+        "status": 1,
+        "created_at": "2024-09-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.8",
+        "is_wishlist": 0
+      },
+      {
+        "id": 2,
+        "tutor_id": 102,
+        "category_id": 11,
+        "language_id": 2,
+        "title": "Advanced Dart",
+        "book_url": "https://example.com/dart_book.pdf",
+        "thumbnail_img": "https://example.com/dart_thumbnail.jpg",
+        "landscape_img": "https://example.com/dart_landscape.jpg",
+        "is_free": 0,
+        "price": 10,
+        "description": "This book covers advanced Dart programming.",
+        "summary": "Master the Dart language with advanced concepts.",
+        "specification": "PDF, 200 pages",
+        "total_view": 2500,
+        "status": 1,
+        "created_at": "2024-08-01",
+        "updated_at": "2024-09-10",
+        "category_name": "Programming",
+        "language_name": "Spanish",
+        "tutor_name": "Jane Smith",
+        "is_buy": 0,
+        "is_user_buy": 0,
+        "avg_rating": "4.9",
+        "is_wishlist": 1
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    EbookModel getEbookModel = EbookModel.fromJson(jsonResponse);
+
     return getEbookModel;
   }
 
+
+
   Future<EbookDetailModel> bookDetail(bookId) async {
-    EbookDetailModel ebookDetailModel;
-    String apiname = "book_detail";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'book_id': bookId,
-        }));
-    ebookDetailModel = EbookDetailModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Book details fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 101,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Learn Flutter",
+        "book_url": "https://example.com/flutter_book.pdf",
+        "thumbnail_img": "https://example.com/flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "description": "This book covers Flutter basics.",
+        "summary": "Learn how to build cross-platform mobile apps using Flutter.",
+        "specification": "PDF, 150 pages",
+        "total_view": 1500,
+        "status": 1,
+        "created_at": "2024-09-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.8",
+        "is_wishlist": 0
+      }
+    ]
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    EbookDetailModel ebookDetailModel = EbookDetailModel.fromJson(jsonResponse);
+
     return ebookDetailModel;
   }
 
+
   Future<RelatedBookModel> relatedBooks(bookId, pageNo) async {
-    RelatedBookModel relatedBookModel;
-    String apiname = "get_related_book";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'book_id': bookId,
-          'page_no': pageNo,
-        }));
-    relatedBookModel = RelatedBookModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Related books fetched successfully",
+    "result": [
+      {
+        "id": 2,
+        "tutor_id": 101,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Advanced Flutter",
+        "book_url": "https://example.com/advanced_flutter.pdf",
+        "thumbnail_img": "https://example.com/advanced_flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/advanced_flutter_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "description": "A comprehensive guide to advanced Flutter concepts.",
+        "summary": "This book dives deeper into advanced Flutter development.",
+        "specification": "PDF, 200 pages",
+        "total_view": 2000,
+        "status": 1,
+        "created_at": "2024-09-02",
+        "updated_at": "2024-09-16",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "Jane Doe",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.9",
+        "is_wishlist": 0
+      },
+      {
+        "id": 3,
+        "tutor_id": 102,
+        "category_id": 12,
+        "language_id": 2,
+        "title": "Flutter for Beginners",
+        "book_url": "https://example.com/flutter_beginners.pdf",
+        "thumbnail_img": "https://example.com/flutter_beginners_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_beginners_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "description": "A beginner's guide to Flutter development.",
+        "summary": "This book covers the basics of Flutter development.",
+        "specification": "PDF, 100 pages",
+        "total_view": 1000,
+        "status": 1,
+        "created_at": "2024-09-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Smith",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.7",
+        "is_wishlist": 1
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    RelatedBookModel relatedBookModel = RelatedBookModel.fromJson(jsonResponse);
+
     return relatedBookModel;
   }
+
 
   Future<Buybookmodel> buybook(bookId, amount, userid) async {
     printLog("Api Service ==>$userid");

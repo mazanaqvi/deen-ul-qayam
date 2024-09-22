@@ -23,16 +23,20 @@ class GetPageModel {
   factory GetPageModel.fromJson(Map<String, dynamic> json) => GetPageModel(
         status: json["status"],
         message: json["message"],
-        result:
-            List<Result>.from(json["result"].map((x) => Result.fromJson(x))),
+        result: json["result"] != null
+            ? List<Result>.from(json["result"].map((x) => Result.fromJson(x)))
+            : [], // Safely handle the null result case
       );
 
   Map<String, dynamic> toJson() => {
         "status": status,
         "message": message,
-        "result": List<dynamic>.from(result!.map((x) => x.toJson())),
+        "result": result != null
+            ? List<dynamic>.from(result!.map((x) => x.toJson()))
+            : [],
       };
 }
+
 
 class Result {
   String? pageName;
