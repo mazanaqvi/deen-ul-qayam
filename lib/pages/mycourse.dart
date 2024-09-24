@@ -295,66 +295,63 @@ class MyCourseState extends State<MyCourse> {
                                   textalign: TextAlign.left,
                                   fontstyle: FontStyle.normal),
                               const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  MyText(
-                                      color: gray,
-                                      text: Utils.kmbGenerator(
-                                        int.parse(myCourseProvider
-                                                .mycourseList?[index].totalView
-                                                .toString() ??
-                                            ""),
-                                      ),
-                                      fontsizeNormal: Dimens.textSmall,
-                                      fontwaight: FontWeight.w500,
-                                      maxline: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textalign: TextAlign.left,
-                                      fontstyle: FontStyle.normal),
-                                  const SizedBox(width: 5),
-                                  MyText(
-                                      color: gray,
-                                      text: "students",
-                                      fontsizeNormal: Dimens.textSmall,
-                                      fontwaight: FontWeight.w500,
-                                      maxline: 1,
-                                      multilanguage: true,
-                                      overflow: TextOverflow.ellipsis,
-                                      textalign: TextAlign.left,
-                                      fontstyle: FontStyle.normal),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  MyRating(
-                                    size: 13,
-                                    rating: double.parse(myCourseProvider
-                                            .mycourseList?[index].avgRating
-                                            .toString() ??
-                                        ""),
-                                    spacing: 2,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  MyText(
-                                      color: colorAccent,
-                                      text:
-                                          "${double.parse(myCourseProvider.mycourseList?[index].avgRating.toString() ?? "")}",
-                                      fontsizeNormal: Dimens.textBigSmall,
-                                      fontwaight: FontWeight.w600,
-                                      maxline: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      textalign: TextAlign.left,
-                                      fontstyle: FontStyle.normal),
-                                ],
-                              ),
-                              generateCertificate(myCourseProvider
-                                      .mycourseList?[index].id
-                                      .toString() ??
-                                  ""),
+                              // Row(
+                              //   mainAxisAlignment: MainAxisAlignment.start,
+                              //   crossAxisAlignment: CrossAxisAlignment.center,
+                              //   children: [
+                              //     MyText(
+                              //         color: gray,
+                              //         text: Utils.kmbGenerator(
+                              //           int.parse(myCourseProvider
+                              //                   .mycourseList?[index].totalView
+                              //                   .toString() ??
+                              //               ""),
+                              //         ),
+                              //         fontsizeNormal: Dimens.textSmall,
+                              //         fontwaight: FontWeight.w500,
+                              //         maxline: 1,
+                              //         overflow: TextOverflow.ellipsis,
+                              //         textalign: TextAlign.left,
+                              //         fontstyle: FontStyle.normal),
+                              //     const SizedBox(width: 5),
+                              //     // MyText(
+                              //     //     color: gray,
+                              //     //     text: "students",
+                              //     //     fontsizeNormal: Dimens.textSmall,
+                              //     //     fontwaight: FontWeight.w500,
+                              //     //     maxline: 1,
+                              //     //     multilanguage: true,
+                              //     //     overflow: TextOverflow.ellipsis,
+                              //     //     textalign: TextAlign.left,
+                              //     //     fontstyle: FontStyle.normal),
+                              //   ],
+                              // ),
+                              // const SizedBox(height: 8),
+                              // Row(
+                              //   mainAxisAlignment: MainAxisAlignment.start,
+                              //   children: [
+                              //     MyRating(
+                              //       size: 13,
+                              //       rating: double.parse(myCourseProvider
+                              //               .mycourseList?[index].avgRating
+                              //               .toString() ??
+                              //           ""),
+                              //       spacing: 2,
+                              //     ),
+                              //     const SizedBox(width: 5),
+                              //     MyText(
+                              //         color: colorAccent,
+                              //         text:
+                              //             "${double.parse(myCourseProvider.mycourseList?[index].avgRating.toString() ?? "")}",
+                              //         fontsizeNormal: Dimens.textBigSmall,
+                              //         fontwaight: FontWeight.w600,
+                              //         maxline: 2,
+                              //         overflow: TextOverflow.ellipsis,
+                              //         textalign: TextAlign.left,
+                              //         fontstyle: FontStyle.normal),
+                              //   ],
+                              // ),
+                              // Hiding the Download Certificate Option
                             ],
                           ),
                         ),

@@ -78,16 +78,20 @@ class ApiService {
     GeneralSettingModel generalSettingModel;
     String apiname = "general_setting";
     dio.interceptors.add(LogInterceptor(
-        responseBody: true)); // Add this line before making the API call
-
+      responseBody: true,
+    )); // Add this line before making the API call
 
     try {
       Response response = await dio.post('$baseUrl$apiname');
       if (response.statusCode == 200) {
         // Parse the result from the response
         generalSettingModel = GeneralSettingModel.fromJson(response.data);
-        print(
-            'General settings fetched successfully: ${generalSettingModel.toString()}');
+
+        // Pretty print the response using jsonEncode with indentation
+        final prettyResponse =
+            JsonEncoder.withIndent('  ').convert(response.data);
+        print('General settings fetched successfully:\n$prettyResponse');
+
         return generalSettingModel;
       } else {
         print('Error: ${response.statusCode}');
@@ -148,13 +152,43 @@ class ApiService {
   }
 
   Future<ProfileModel> profile() async {
-    ProfileModel profileModel;
-    String apiname = "get_profile";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-        }));
-    profileModel = ProfileModel.fromJson(response.data);
+    // Hardcoded profile response
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Profile fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "firebase_id": "hardcoded_firebase_id",
+        "user_name": "Essa",
+        "full_name": "Essa Arshad",
+        "email": "essa@example.com",
+        "mobile_number": "+1234567890",
+        "country_code": "US",
+        "country_name": "United States",
+        "type": 1,
+        "image": "https://example.com/profile_image.jpg",
+        "description": "This is a hardcoded profile description.",
+        "pratice_quiz_score": 80,
+        "is_tutor": 0,
+        "device_type": 1,
+        "device_token": "hardcoded_device_token",
+        "status": 1,
+        "created_at": "2024-01-01 12:00:00",
+        "updated_at": "2024-09-20 12:00:00",
+        "is_buy": 0,
+        "package_name": "Premium",
+        "package_price": 0.00
+      }
+    ]
+  }
+  ''';
+
+    // Parse the hardcoded response into ProfileModel
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    ProfileModel profileModel = ProfileModel.fromJson(jsonResponse);
+
     return profileModel;
   }
 
@@ -201,10 +235,38 @@ class ApiService {
   }
 
   Future<SocialLinkModel> getSocialLink() async {
-    SocialLinkModel socialLinkModel;
-    String apiname = "get_social_link";
-    Response response = await dio.post('$baseUrl$apiname');
-    socialLinkModel = SocialLinkModel.fromJson(response.data);
+    // Hardcoded JSON response
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Social links fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "name": "Facebook",
+        "image": "https://example.com/facebook_logo.png",
+        "url": "https://www.facebook.com/",
+        "status": 1,
+        "created_at": "2024-01-01 12:00:00",
+        "updated_at": "2024-09-20 12:00:00"
+      },
+      {
+        "id": 2,
+        "name": "Twitter",
+        "image": "https://example.com/twitter_logo.png",
+        "url": "https://www.twitter.com/",
+        "status": 1,
+        "created_at": "2024-01-01 12:00:00",
+        "updated_at": "2024-09-20 12:00:00"
+      }
+    ]
+  }
+  ''';
+
+    // Parse the hardcoded response into SocialLinkModel
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    SocialLinkModel socialLinkModel = SocialLinkModel.fromJson(jsonResponse);
+
     return socialLinkModel;
   }
 
@@ -247,19 +309,71 @@ class ApiService {
   }
 
   Future<MyCourseModel> mycourse(pageno) async {
-    MyCourseModel mycoursemodel;
-    String apiname = "my_course";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'page_no': pageno,
-        }));
-    mycoursemodel = MyCourseModel.fromJson(response.data);
-    return mycoursemodel;
+    // Hardcoded JSON response
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Courses fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 123,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Introduction to Flutter",
+        "description": "This is a beginner course for Flutter development.",
+        "thumbnail_img": "https://example.com/thumbnail.jpg",
+        "landscape_img": "https://example.com/landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "total_view": 1024,
+        "status": 1,
+        "created_at": "2024-09-15",
+        "updated_at": "2024-09-16",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 1,
+        "avg_rating": "4.8",
+        "is_download_certificate": 1
+      },
+      {
+        "id": 2,
+        "tutor_id": 102,
+        "category_id": 15,
+        "language_id": 2,
+        "title": "Data Science with Python",
+        "description": "A comprehensive guide to data science using Python.",
+        "thumbnail_img": "https://example.com/python_thumbnail.jpg",
+        "landscape_img": "https://example.com/python_landscape.jpg",
+        "is_free": 0,
+        "price": 49,
+        "total_view": 2300,
+        "status": 1,
+        "created_at": "2024-08-01",
+        "updated_at": "2024-09-18",
+        "category_name": "Data Science",
+        "language_name": "Spanish",
+        "tutor_name": "Jane Smith",
+        "is_buy": 0,
+        "avg_rating": "4.7",
+        "is_download_certificate": 0
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    MyCourseModel myCourseModel = MyCourseModel.fromJson(jsonResponse);
+
+    return myCourseModel;
   }
 
   Future<SearchModel> search(type, name) async {
-    // Hardcoded search response
     var hardcodedSearchResponse = {
       "status": 200,
       "message": "Success",
@@ -285,7 +399,7 @@ class ApiService {
           "is_buy": 1,
           "is_user_buy": 1,
           "avg_rating": "4.8",
-          "is_wishlist": 1,
+          "is_wishlist": 1
         }
       ],
       "total_rows": 1,
@@ -294,7 +408,6 @@ class ApiService {
       "more_page": false
     };
 
-    // Manually populate SearchModel using the hardcoded response
     SearchModel searchModel = SearchModel.fromJson(hardcodedSearchResponse);
 
     return searchModel;
@@ -303,16 +416,118 @@ class ApiService {
 /* Video By Category & Language */
 
   Future<VideobyIdModel> getContentbyCategoryId(categoryId, pageNo) async {
-    VideobyIdModel videobyIdModel;
-    String apiname = "get_content_by_category";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'category_id': categoryId,
-          'page_no': pageNo,
-        }));
-    videobyIdModel = VideobyIdModel.fromJson(response.data);
-    return videobyIdModel;
+  // Create a variable to store the hardcoded response based on the courseId and chapterId
+  var hardcodedVideoByChapterResponse;
+
+  // Condition to return different content based on the courseId or chapterId
+  if (categoryId == 10) {
+    // Content for the Flutter course (categoryId = 10)
+    hardcodedVideoByChapterResponse = {
+      "status": 200,
+      "message": "Success",
+      "result": [
+        {
+          "id": 1,
+          "course_id": categoryId,
+          "chapter_id": 1,
+          "title": "Flutter - Introduction",
+          "thumbnail_img": "https://example.com/flutter_thumbnail1.jpg",
+          "landscape_img": "https://example.com/flutter_landscape1.jpg",
+          "video_type": "mp4",
+          "video_url":
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "duration": 600,
+          "description": "Introduction to Flutter Development.",
+          "total_view": 1500,
+          "status": 1,
+          "created_at": "2024-09-15",
+          "updated_at": "2024-09-16",
+          "is_buy": 1,
+          "is_read": 1
+        },
+        {
+          "id": 2,
+          "course_id": categoryId,
+          "chapter_id": 2,
+          "title": "Flutter - Widgets",
+          "thumbnail_img": "https://example.com/flutter_thumbnail2.jpg",
+          "landscape_img": "https://example.com/flutter_landscape2.jpg",
+          "video_type": "mp4",
+          "video_url":
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "duration": 900,
+          "description": "Introduction to Widgets in Flutter.",
+          "total_view": 1000,
+          "status": 1,
+          "created_at": "2024-09-15",
+          "updated_at": "2024-09-16",
+          "is_buy": 1,
+          "is_read": 1
+        }
+      ],
+      "total_rows": 2,
+      "total_page": 1,
+      "current_page": 1,
+      "more_page": false
+    };
+  } else if (categoryId == 15) {
+    // Content for the Data Science course (categoryId = 15)
+    hardcodedVideoByChapterResponse = {
+      "status": 200,
+      "message": "Success",
+      "result": [
+        {
+          "id": 1,
+          "course_id": categoryId,
+          "chapter_id": 1,
+          "title": "Data Science - Python Introduction",
+          "thumbnail_img": "https://example.com/python_thumbnail1.jpg",
+          "landscape_img": "https://example.com/python_landscape1.jpg",
+          "video_type": "mp4",
+          "video_url":
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "duration": 1200,
+          "description": "Introduction to Data Science using Python.",
+          "total_view": 2300,
+          "status": 1,
+          "created_at": "2024-08-01",
+          "updated_at": "2024-09-18",
+          "is_buy": 1,
+          "is_read": 1
+        },
+        {
+          "id": 2,
+          "course_id": categoryId,
+          "chapter_id": 2,
+          "title": "Data Science - Pandas Overview",
+          "thumbnail_img": "https://example.com/python_thumbnail2.jpg",
+          "landscape_img": "https://example.com/python_landscape2.jpg",
+          "video_type": "mp4",
+          "video_url":
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "duration": 1500,
+          "description": "Learn how to use Pandas for Data Science.",
+          "total_view": 2000,
+          "status": 1,
+          "created_at": "2024-08-01",
+          "updated_at": "2024-09-18",
+          "is_buy": 0,
+          "is_read": 1
+        }
+      ],
+      "total_rows": 2,
+      "total_page": 1,
+      "current_page": 1,
+      "more_page": false
+    };
   }
+
+  // Parse the hardcoded response into VideobyIdModel
+  final jsonResponse = jsonDecode(jsonEncode(hardcodedVideoByChapterResponse));
+  VideobyIdModel videobyIdModel = VideobyIdModel.fromJson(jsonResponse);
+
+  return videobyIdModel;
+}
 
   Future<VideobyIdModel> getContentbyLanguageId(languageId, pageNo) async {
     VideobyIdModel videobyIdModel;
@@ -339,7 +554,7 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
       "message": "Success",
       "result": [
         {
-          "id": 1,
+          "id": 2,
           "tutor_id": 123,
           "category_id": 10,
           "language_id": 1,
@@ -365,7 +580,7 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
           "chapter": [
             {
               "id": 1,
-              "course_id": 1,
+              "course_id": 2,
               "name": "Getting Started with Flutter",
               "image": "https://example.com/chapter1.jpg",
               "quiz_status": 1,
@@ -376,7 +591,7 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
             },
             {
               "id": 2,
-              "course_id": 1,
+              "course_id": 2,
               "name": "Flutter Widgets",
               "image": "https://example.com/chapter2.jpg",
               "quiz_status": 1,
@@ -389,7 +604,7 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
           "requrirment": [
             {
               "id": 1,
-              "course_id": 1,
+              "course_id": 2,
               "title": "Basic knowledge of programming",
               "status": 1,
               "created_at": "2024-09-15",
@@ -399,7 +614,7 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
           "inlcude": [
             {
               "id": 1,
-              "course_id": 1,
+              "course_id": 2,
               "title": "Lifetime access",
               "status": 1,
               "created_at": "2024-09-15",
@@ -409,7 +624,7 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
           "what_you_learn": [
             {
               "id": 1,
-              "course_id": 1,
+              "course_id": 2,
               "title": "Understand Flutter basics",
               "status": 1,
               "created_at": "2024-09-15",
@@ -417,7 +632,7 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
             },
             {
               "id": 2,
-              "course_id": 1,
+              "course_id": 2,
               "title": "Create Flutter mobile apps",
               "status": 1,
               "created_at": "2024-09-15",
@@ -492,61 +707,102 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
 
 Future<GetVideoByChapterModel> videoByChapter(
       courseId, chapterId, pageNo) async {
-    // Hardcoded response for video by chapter
-    var hardcodedVideoByChapterResponse = {
-      "status": 200,
-      "message": "Success",
-      "result": [
-        {
-          "id": 1,
-          "course_id": courseId,
-          "chapter_id": chapterId,
-          "title": "Big Buck Bunny - Introduction",
-          "thumbnail_img": "https://example.com/thumbnail1.jpg",
-          "landscape_img": "https://example.com/landscape1.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": "600", // Example of a string that should be an int
-          "description": "Enjoy this animated short featuring Big Buck Bunny.",
-          "total_view": "1000", // Example of a string that should be an int
-          "status": 1,
-          "created_at": "2024-09-15",
-          "updated_at": "2024-09-16",
-          "is_buy": "1", // Example of a string that should be an int
-          "is_read": 1
-        },
-        {
-          "id": 2,
-          "course_id": courseId,
-          "chapter_id": chapterId,
-          "title": "Big Buck Bunny - Behind the Scenes",
-          "thumbnail_img": "https://example.com/thumbnail2.jpg",
-          "landscape_img": "https://example.com/landscape2.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 900,
-          "description":
-              "A behind-the-scenes look at the making of Big Buck Bunny.",
-          "total_view": 500,
-          "status": 1,
-          "created_at": "2024-09-15",
-          "updated_at": "2024-09-16",
-          "is_buy": 1,
-          "is_read": 0
-        }
-      ],
-      "total_rows": 2,
-      "total_page": 1,
-      "current_page": 1,
-      "more_page": false
-    };
+    // Log the input parameters
+    print(
+        'DEBUG: Called videoByChapter with courseId: $courseId, chapterId: $chapterId, pageNo: $pageNo');
 
-    // Sanitizing the fields that may have type mismatch issues
+    var hardcodedVideoByChapterResponse;
+
+    // Condition to return different content based on the courseId or chapterId
+    if (int.parse(courseId.toString()) == 1 &&
+        int.parse(chapterId.toString()) == 1) {
+
+      print('DEBUG: Returning content for Course 1, Chapter 1');
+
+      hardcodedVideoByChapterResponse = {
+        "status": 200,
+        "message": "Success",
+        "result": [
+          {
+            "id": 1,
+            "course_id": courseId,
+            "chapter_id": chapterId,
+            "title": "Course 1 - Introduction",
+            "thumbnail_img": "https://example.com/course1_thumbnail1.jpg",
+            "landscape_img": "https://example.com/course1_landscape1.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 600,
+            "description": "Introduction to Course 1.",
+            "total_view": 1500,
+            "status": 1,
+            "created_at": "2024-09-15",
+            "updated_at": "2024-09-16",
+            "is_buy": 1,
+            "is_read": 1
+          }
+        ],
+        "total_rows": 1,
+        "total_page": 1,
+        "current_page": 1,
+        "more_page": false
+      };
+    } else if (int.parse(courseId.toString()) == 2 &&
+        int.parse(chapterId.toString()) == 1) {
+      print('DEBUG: Returning content for Course 2, Chapter 1');
+
+      hardcodedVideoByChapterResponse = {
+        "status": 200,
+        "message": "Success",
+        "result": [
+          {
+            "id": 2,
+            "course_id": courseId,
+            "chapter_id": chapterId,
+            "title": "Course 2 - Introduction",
+            "thumbnail_img": "https://example.com/course2_thumbnail1.jpg",
+            "landscape_img": "https://example.com/course2_landscape1.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 1200,
+            "description": "Introduction to Course 2.",
+            "total_view": 2300,
+            "status": 1,
+            "created_at": "2024-08-01",
+            "updated_at": "2024-09-18",
+            "is_buy": 1,
+            "is_read": 1
+          }
+        ],
+        "total_rows": 1,
+        "total_page": 1,
+        "current_page": 1,
+        "more_page": false
+      };
+    } else {
+      print(
+          'DEBUG: No content available for courseId: $courseId, chapterId: $chapterId');
+
+      hardcodedVideoByChapterResponse = {
+        "status": 200,
+        "message": "No videos available",
+        "result": [],
+        "total_rows": 0,
+        "total_page": 0,
+        "current_page": 0,
+        "more_page": false
+      };
+    }
+
+    // Log the response before sanitization
+    print(
+        'DEBUG: Hardcoded response before sanitization: $hardcodedVideoByChapterResponse');
+
+    // Sanitize the result to ensure types are correct
     List<Map<String, dynamic>> sanitizedResults =
         (hardcodedVideoByChapterResponse["result"] as List).map((video) {
-      // Ensure the types for `int` fields are correct
       return {
         "id": int.tryParse(video["id"].toString()) ?? 0,
         "course_id": int.tryParse(video["course_id"].toString()) ?? 0,
@@ -567,12 +823,18 @@ Future<GetVideoByChapterModel> videoByChapter(
       };
     }).toList();
 
-    // Update the sanitized response back to the original response structure
+    // Log the sanitized results
+    print('DEBUG: Sanitized results: $sanitizedResults');
+
+    // Update the sanitized response back to the original structure
     hardcodedVideoByChapterResponse["result"] = sanitizedResults;
 
-    // Manually populate GetVideoByChapterModel using the sanitized response
+    // Convert to GetVideoByChapterModel
     GetVideoByChapterModel getVideoByChapterModel =
         GetVideoByChapterModel.fromJson(hardcodedVideoByChapterResponse);
+
+    // Log the final model before returning
+    print('DEBUG: Returning GetVideoByChapterModel: $getVideoByChapterModel');
 
     return getVideoByChapterModel;
   }
