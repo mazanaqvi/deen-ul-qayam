@@ -425,41 +425,41 @@ class AccountState extends State<Account> {
               child: Column(
                 children: [
                   /* Package Discription */
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      MyImage(
-                        width: 25,
-                        height: 25,
-                        imagePath: "ic_premium.png",
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: MyText(
-                          color: Theme.of(context).colorScheme.surface,
-                          text: "subscribedisc",
-                          maxline: 2,
-                          fontwaight: FontWeight.w600,
-                          fontsizeNormal: Dimens.textTitle,
-                          overflow: TextOverflow.ellipsis,
-                          textalign: TextAlign.left,
-                          fontstyle: FontStyle.normal,
-                          multilanguage: true,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(15, 15, 0, 15),
-                        child: MyImage(
-                          width: 12,
-                          height: 15,
-                          imagePath: "ic_right.png",
-                          color: gray,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.start,
+                  //   crossAxisAlignment: CrossAxisAlignment.center,
+                  //   children: [
+                  //     // MyImage(
+                  //     //   width: 25,
+                  //     //   height: 25,
+                  //     //   imagePath: "ic_premium.png",
+                  //     //   color: Theme.of(context).colorScheme.surface,
+                  //     // ),
+                  //     const SizedBox(width: 15),
+                  //     // Expanded(
+                  //     //   child: MyText(
+                  //     //     color: Theme.of(context).colorScheme.surface,
+                  //     //     text: "subscribedisc",
+                  //     //     maxline: 2,
+                  //     //     fontwaight: FontWeight.w600,
+                  //     //     fontsizeNormal: Dimens.textTitle,
+                  //     //     overflow: TextOverflow.ellipsis,
+                  //     //     textalign: TextAlign.left,
+                  //     //     fontstyle: FontStyle.normal,
+                  //     //     multilanguage: true,
+                  //     //   ),
+                  //     // ),
+                  //     Padding(
+                  //       padding: const EdgeInsets.fromLTRB(15, 15, 0, 15),
+                  //       child: MyImage(
+                  //         width: 12,
+                  //         height: 15,
+                  //         imagePath: "ic_right.png",
+                  //         color: gray,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   /* Active Package */
                   // Constant.isBuy == "1"
                   Constant.isBuy == "1" && Constant.userID != null

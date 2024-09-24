@@ -59,8 +59,8 @@ class ApiService {
 
   ApiService() {
     dio = Dio();
-    dio.options.headers["Content-Type"] = "multipart/form-data";
-    // dio.interceptors.add(
+    dio.options.headers['Content-Type'] = 'application/json';
+    // dio.interceptos.add(
     //   PrettyDioLogger(
     //       requestHeader: true,
     //       requestBody: true,
@@ -77,9 +77,26 @@ class ApiService {
   Future<GeneralSettingModel> genaralSetting() async {
     GeneralSettingModel generalSettingModel;
     String apiname = "general_setting";
-    Response response = await dio.post('$baseUrl$apiname');
-    generalSettingModel = GeneralSettingModel.fromJson(response.data);
-    return generalSettingModel;
+    dio.interceptors.add(LogInterceptor(
+        responseBody: true)); // Add this line before making the API call
+
+
+    try {
+      Response response = await dio.post('$baseUrl$apiname');
+      if (response.statusCode == 200) {
+        // Parse the result from the response
+        generalSettingModel = GeneralSettingModel.fromJson(response.data);
+        print(
+            'General settings fetched successfully: ${generalSettingModel.toString()}');
+        return generalSettingModel;
+      } else {
+        print('Error: ${response.statusCode}');
+        throw Exception("Failed to fetch general settings");
+      }
+    } catch (e) {
+      print("Dio error: $e");
+      throw Exception("Failed to fetch general settings");
+    }
   }
 
   Future<IntroScreenModel> getOnboardingScreen() async {
@@ -311,7 +328,11 @@ class ApiService {
 
   /* Detail Page All Api's Start */
 
+<<<<<<< HEAD
 Future<CourseDetailsModel> courseDetail(courseId) async {
+=======
+  Future<CourseDetailsModel> courseDetail(courseId) async {
+>>>>>>> feature/update-course-layout
     // Create a hardcoded response matching the structure of CourseDetailsModel
     var hardcodedResponse = {
       "status": 200,

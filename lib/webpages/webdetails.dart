@@ -2588,7 +2588,7 @@ class WebDetailState extends State<WebDetail> {
         children: [
           MyText(
               color: Theme.of(context).colorScheme.surface,
-              text: "curriculim",
+              text: "Curriculum",
               fontsizeNormal: Dimens.textlargeBig,
               fontsizeWeb: Dimens.textlargeBig,
               fontwaight: FontWeight.w600,
