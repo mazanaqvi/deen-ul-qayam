@@ -1350,18 +1350,20 @@ class ApiService {
   }
 
   Future<Addcommentmodel> addcomment(userid, videoid, courseid, comment) async {
-    Addcommentmodel addcommentmodel;
-    String apiname = "add_comment";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': userid,
-          'video_id': videoid,
-          'course_id': courseid,
-          'comment': comment,
-        }));
-    addcommentmodel = Addcommentmodel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Comment added successfully",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Addcommentmodel addcommentmodel = Addcommentmodel.fromJson(jsonResponse);
+
     return addcommentmodel;
   }
+
 
 /* Quize Api Start */
 
@@ -1452,28 +1454,60 @@ class ApiService {
   }
 
   Future<NotificationModel> getNotification(pageNo) async {
-    NotificationModel notificationModel;
-    String apiname = "get_notification";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'page_no': pageNo,
-        }));
-    notificationModel = NotificationModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Notifications fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "title": "New Course Available",
+        "message": "Check out the new Flutter course we just added!",
+        "image": "https://example.com/course_image.jpg",
+        "status": 1,
+        "created_at": "2024-09-15",
+        "updated_at": "2024-09-15"
+      },
+      {
+        "id": 2,
+        "title": "Limited Time Offer",
+        "message": "Get 50% off on all premium courses.",
+        "image": "https://example.com/offer_image.jpg",
+        "status": 1,
+        "created_at": "2024-09-10",
+        "updated_at": "2024-09-10"
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    NotificationModel notificationModel =
+        NotificationModel.fromJson(jsonResponse);
+
     return notificationModel;
   }
 
+
   Future<SuccessModel> readNotification(notificationId) async {
-    SuccessModel successModel;
-    String apiname = "read_notification";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'notification_id': notificationId,
-        }));
-    successModel = SuccessModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Notification marked as read successfully",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    SuccessModel successModel = SuccessModel.fromJson(jsonResponse);
+
     return successModel;
   }
+
 
 /* Books Related APi Start */
 
@@ -1668,34 +1702,48 @@ class ApiService {
 
 
   Future<Buybookmodel> buybook(bookId, amount, userid) async {
-    printLog("Api Service ==>$userid");
-    Buybookmodel buybookmodel;
-    String apiname = "buy_book";
-    printLog("userid==>${Constant.userID}");
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'book_id': bookId,
-          'total_amount': amount,
-        }));
-    buybookmodel = Buybookmodel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Book purchased successfully",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Buybookmodel buybookmodel = Buybookmodel.fromJson(jsonResponse);
+
     return buybookmodel;
   }
+
 
 /* Books Related Api End */
 
   /* Blog Related Api Start */
 
   Future<BlogDetailModel> blogDetail(blogId) async {
-    BlogDetailModel blogDetailModel;
-    String apiname = "blog_detail";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'blog_id': blogId,
-        }));
-    blogDetailModel = BlogDetailModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Blog detail fetched successfully",
+    "result": {
+      "id": 1,
+      "title": "Introduction to Flutter",
+      "content": "This blog post provides an introduction to Flutter and its features.",
+      "image": "https://example.com/flutter_blog_image.jpg",
+      "author": "John Doe",
+      "created_at": "2024-09-15",
+      "updated_at": "2024-09-16"
+    }
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    BlogDetailModel blogDetailModel = BlogDetailModel.fromJson(jsonResponse);
+
     return blogDetailModel;
   }
+
 
   /* Blog Related Api End */
 
