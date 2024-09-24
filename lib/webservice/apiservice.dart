@@ -128,7 +128,6 @@ class ApiService {
 
     return generalSettingModel;
   }
-  
 
   Future<IntroScreenModel> getOnboardingScreen() async {
     const hardcodedResponse = '''
@@ -208,8 +207,6 @@ class ApiService {
     return loginModel;
   }
 
-
-
   Future<Registermodel> register(
       fullname, email, number, password, countryCode, countryName) async {
     Registermodel registermodel;
@@ -267,29 +264,30 @@ class ApiService {
   }
 
   Future<Updateprofilemodel> updateprofile(fullname, mobilenumber, email,
-    countryCode, countryName, File imagefile) async {
-  const hardcodedResponse = '''
+      countryCode, countryName, File imagefile) async {
+    const hardcodedResponse = '''
   {
     "status": 200,
     "message": "Profile updated successfully"
   }
   ''';
 
-  print('Updating profile with the following details:');
-  print('Full Name: $fullname');
-  print('Mobile Number: $mobilenumber');
-  print('Email: $email');
-  print('Country Code: $countryCode');
-  print('Country Name: $countryName');
-  print('Image File: ${imagefile.path}');
+    print('Updating profile with the following details:');
+    print('Full Name: $fullname');
+    print('Mobile Number: $mobilenumber');
+    print('Email: $email');
+    print('Country Code: $countryCode');
+    print('Country Name: $countryName');
+    print('Image File: ${imagefile.path}');
 
-  final jsonResponse = jsonDecode(hardcodedResponse);
-  Updateprofilemodel updateprofilemodel = Updateprofilemodel.fromJson(jsonResponse);
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Updateprofilemodel updateprofilemodel =
+        Updateprofilemodel.fromJson(jsonResponse);
 
-  print('Hardcoded Response for Update Profile: $jsonResponse');
+    print('Hardcoded Response for Update Profile: $jsonResponse');
 
-  return updateprofilemodel;
-}
+    return updateprofilemodel;
+  }
 
   Future<Updateprofilemodel> forgotPassword(password) async {
     Updateprofilemodel forgotpasswordModel;
@@ -337,7 +335,6 @@ class ApiService {
 
     return getPageModel;
   }
-
 
   Future<SocialLinkModel> getSocialLink() async {
     const hardcodedResponse = '''
@@ -443,7 +440,6 @@ class ApiService {
 
     return categoryModel;
   }
-
 
   Future<MyCourseModel> mycourse(pageno) async {
     const hardcodedResponse = '''
@@ -729,11 +725,9 @@ class ApiService {
     return videobyIdModel;
   }
 
-
   /* Detail Page All Api's Start */
 
-Future<CourseDetailsModel> courseDetail(courseId) async {
-    // Create a hardcoded response matching the structure of CourseDetailsModel
+  Future<CourseDetailsModel> courseDetail(courseId) async {
     var hardcodedResponse = {
       "status": 200,
       "message": "Success",
@@ -834,7 +828,6 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
     return courseDetailsModel;
   }
 
-
   Future<GetCourseReviewModel> courseReviewList(type, contentId, pageNo) async {
     const hardcodedResponse = '''
   {
@@ -883,7 +876,6 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
 
     return getCourseReviewModel;
   }
-
 
   Future<SuccessModel> addContentView(type, contentId, videoId) async {
     const hardcodedResponse = '''
@@ -982,9 +974,7 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
     return relatedCourseModel;
   }
 
-
-
-Future<GetVideoByChapterModel> videoByChapter(
+  Future<GetVideoByChapterModel> videoByChapter(
       courseId, chapterId, pageNo) async {
     print(
         'DEBUG: Called videoByChapter with courseId: $courseId, chapterId: $chapterId, pageNo: $pageNo');
@@ -1150,7 +1140,7 @@ Future<GetVideoByChapterModel> videoByChapter(
   /* (Wishlist Api Start) */
 
   Future<Wishlistmodel> wishlist(type, pageno) async {
-  const hardcodedResponse = '''
+    const hardcodedResponse = '''
   {
     "status": 200,
     "message": "Wishlist fetched successfully",
@@ -1207,12 +1197,11 @@ Future<GetVideoByChapterModel> videoByChapter(
   }
   ''';
 
-  final jsonResponse = jsonDecode(hardcodedResponse);
-  Wishlistmodel wishlistmodel = Wishlistmodel.fromJson(jsonResponse);
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Wishlistmodel wishlistmodel = Wishlistmodel.fromJson(jsonResponse);
 
-  return wishlistmodel;
-}
-
+    return wishlistmodel;
+  }
 
   Future<SuccessModel> addRemoveWishlist(type, contentId) async {
     const hardcodedResponse = '''
@@ -1367,7 +1356,6 @@ Future<GetVideoByChapterModel> videoByChapter(
     return addcommentmodel;
   }
 
-
 /* Quize Api Start */
 
   Future<GetQuestionByChapterModel> questionByChapter(
@@ -1495,7 +1483,6 @@ Future<GetVideoByChapterModel> videoByChapter(
     return notificationModel;
   }
 
-
   Future<SuccessModel> readNotification(notificationId) async {
     const hardcodedResponse = '''
   {
@@ -1510,7 +1497,6 @@ Future<GetVideoByChapterModel> videoByChapter(
 
     return successModel;
   }
-
 
 /* Books Related APi Start */
 
@@ -1586,8 +1572,6 @@ Future<GetVideoByChapterModel> videoByChapter(
     return getEbookModel;
   }
 
-
-
   Future<EbookDetailModel> bookDetail(bookId) async {
     const hardcodedResponse = '''
   {
@@ -1629,7 +1613,6 @@ Future<GetVideoByChapterModel> videoByChapter(
 
     return ebookDetailModel;
   }
-
 
   Future<RelatedBookModel> relatedBooks(bookId, pageNo) async {
     const hardcodedResponse = '''
@@ -1703,7 +1686,6 @@ Future<GetVideoByChapterModel> videoByChapter(
     return relatedBookModel;
   }
 
-
   Future<Buybookmodel> buybook(bookId, amount, userid) async {
     const hardcodedResponse = '''
   {
@@ -1718,7 +1700,6 @@ Future<GetVideoByChapterModel> videoByChapter(
 
     return buybookmodel;
   }
-
 
 /* Books Related Api End */
 
@@ -1746,7 +1727,6 @@ Future<GetVideoByChapterModel> videoByChapter(
 
     return blogDetailModel;
   }
-
 
   /* Blog Related Api End */
 
