@@ -75,64 +75,140 @@ class ApiService {
   /* General APi Start */
 
   Future<GeneralSettingModel> genaralSetting() async {
-    GeneralSettingModel generalSettingModel;
-    String apiname = "general_setting";
-    dio.interceptors.add(LogInterceptor(
-      responseBody: true,
-    )); // Add this line before making the API call
-
-    try {
-      Response response = await dio.post('$baseUrl$apiname');
-      if (response.statusCode == 200) {
-        // Parse the result from the response
-        generalSettingModel = GeneralSettingModel.fromJson(response.data);
-
-        // Pretty print the response using jsonEncode with indentation
-        final prettyResponse =
-            JsonEncoder.withIndent('  ').convert(response.data);
-        print('General settings fetched successfully:\n$prettyResponse');
-
-        return generalSettingModel;
-      } else {
-        print('Error: ${response.statusCode}');
-        throw Exception("Failed to fetch general settings");
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Get Record Successfully",
+    "result": [
+      {
+        "id": 1,
+        "key": "app_name",
+        "value": "DTLearning"
+      },
+      {
+        "id": 2,
+        "key": "host_email",
+        "value": "admin@admin.com"
+      },
+      {
+        "id": 3,
+        "key": "app_version",
+        "value": "1.0"
+      },
+      {
+        "id": 4,
+        "key": "author",
+        "value": "Admin"
+      },
+      {
+        "id": 5,
+        "key": "email",
+        "value": "admin@admin.com"
+      },
+      {
+        "id": 6,
+        "key": "contact",
+        "value": "1020304050"
+      },
+      {
+        "id": 7,
+        "key": "app_description",
+        "value": "DivineTechs, a top web & mobile app development company offering innovative solutions for diverse industry verticals.\\r\\nWe have a creative and dedicated group of developers who are mastered in Apps Development and Web Development with expertise in delivering quality solutions to customers across the globe."
       }
-    } catch (e) {
-      print("Dio error: $e");
-      throw Exception("Failed to fetch general settings");
-    }
+    ]
   }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    GeneralSettingModel generalSettingModel =
+        GeneralSettingModel.fromJson(jsonResponse);
+
+    final prettyResponse = JsonEncoder.withIndent('  ').convert(jsonResponse);
+    print('General settings fetched successfully:\n$prettyResponse');
+
+    return generalSettingModel;
+  }
+  
 
   Future<IntroScreenModel> getOnboardingScreen() async {
-    IntroScreenModel introScreenModel;
-    String apiName = "get_onboarding_screen";
-    Response response = await dio.post(
-      '$baseUrl$apiName',
-    );
-    introScreenModel = IntroScreenModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Onboarding screens fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "title": "Welcome to Our App",
+        "image": "https://example.com/welcome_image.png",
+        "status": 1,
+        "created_at": "2024-09-01 12:00:00",
+        "updated_at": "2024-09-15 12:00:00"
+      },
+      {
+        "id": 2,
+        "title": "Learn and Grow",
+        "image": "https://example.com/learn_image.png",
+        "status": 1,
+        "created_at": "2024-09-02 12:00:00",
+        "updated_at": "2024-09-15 12:00:00"
+      },
+      {
+        "id": 3,
+        "title": "Achieve Your Goals",
+        "image": "https://example.com/goals_image.png",
+        "status": 1,
+        "created_at": "2024-09-03 12:00:00",
+        "updated_at": "2024-09-15 12:00:00"
+      }
+    ]
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    IntroScreenModel introScreenModel = IntroScreenModel.fromJson(jsonResponse);
+
+    print('Hardcoded API Response for getOnboardingScreen: $jsonResponse');
+
     return introScreenModel;
   }
 
   Future<Loginmodel> login(type, number, email, password, deviceType,
       deviceToken, firebaseId, countryCode, countryName) async {
-    Loginmodel loginModel;
-    String login = "login";
-    Response response = await dio.post('$baseUrl$login',
-        data: FormData.fromMap({
-          'type': type,
-          'mobile_number': number,
-          'email': email,
-          'password': password,
-          'device_type': deviceType,
-          'device_token': deviceToken,
-          'firebase_id': firebaseId,
-          'country_code': countryCode,
-          'country_name': countryName,
-        }));
+    final hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Login successful",
+    "result": [
+      {
+        "id": 1,
+        "firebase_id": "$firebaseId",
+        "user_name": "Essa",
+        "full_name": "Essa Arshad",
+        "email": "$email",
+        "password": "$password",
+        "mobile_number": "$number",
+        "type": $type,
+        "image": "https://example.com/profile_image.jpg",
+        "bio": "This is a hardcoded bio.",
+        "device_type": $deviceType,
+        "device_token": "$deviceToken",
+        "pratice_quiz_score": 100,
+        "status": 1,
+        "created_at": "2024-09-20 12:00:00",
+        "updated_at": "2024-09-20 12:30:00",
+        "is_buy": 0
+      }
+    ]
+  }
+  ''';
 
-    loginModel = Loginmodel.fromJson(response.data);
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Loginmodel loginModel = Loginmodel.fromJson(jsonResponse);
+
     return loginModel;
   }
+
+
 
   Future<Registermodel> register(
       fullname, email, number, password, countryCode, countryName) async {
@@ -152,7 +228,6 @@ class ApiService {
   }
 
   Future<ProfileModel> profile() async {
-    // Hardcoded profile response
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -185,7 +260,6 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into ProfileModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     ProfileModel profileModel = ProfileModel.fromJson(jsonResponse);
 
@@ -193,25 +267,29 @@ class ApiService {
   }
 
   Future<Updateprofilemodel> updateprofile(fullname, mobilenumber, email,
-      countryCode, countryName, File imagefile) async {
-    Updateprofilemodel updateprofilemodel;
-    String updateprofile = "update_profile";
-    Response response = await dio.post('$baseUrl$updateprofile',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'full_name': fullname,
-          'email': email,
-          'mobile_number': mobilenumber,
-          'country_code': countryCode,
-          'country_name': countryName,
-          if (imagefile.path != "")
-            'image': await MultipartFile.fromFile(imagefile.path,
-                filename: basename(imagefile.path)),
-        }));
-
-    updateprofilemodel = Updateprofilemodel.fromJson(response.data);
-    return updateprofilemodel;
+    countryCode, countryName, File imagefile) async {
+  const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Profile updated successfully"
   }
+  ''';
+
+  print('Updating profile with the following details:');
+  print('Full Name: $fullname');
+  print('Mobile Number: $mobilenumber');
+  print('Email: $email');
+  print('Country Code: $countryCode');
+  print('Country Name: $countryName');
+  print('Image File: ${imagefile.path}');
+
+  final jsonResponse = jsonDecode(hardcodedResponse);
+  Updateprofilemodel updateprofilemodel = Updateprofilemodel.fromJson(jsonResponse);
+
+  print('Hardcoded Response for Update Profile: $jsonResponse');
+
+  return updateprofilemodel;
+}
 
   Future<Updateprofilemodel> forgotPassword(password) async {
     Updateprofilemodel forgotpasswordModel;
@@ -227,15 +305,41 @@ class ApiService {
   }
 
   Future<GetPageModel> getpage() async {
-    GetPageModel getPageModel;
-    String apiname = "get_pages";
-    Response response = await dio.post('$baseUrl$apiname');
-    getPageModel = GetPageModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Pages fetched successfully",
+    "result": [
+      {
+        "page_name": "About Us",
+        "title": "Learn more about us",
+        "url": "https://example.com/about",
+        "icon": "https://example.com/icons/about_icon.png"
+      },
+      {
+        "page_name": "Contact Us",
+        "title": "Get in touch with us",
+        "url": "https://example.com/contact",
+        "icon": "https://example.com/icons/contact_icon.png"
+      },
+      {
+        "page_name": "Privacy Policy",
+        "title": "Read our privacy policy",
+        "url": "https://example.com/privacy",
+        "icon": "https://example.com/icons/privacy_icon.png"
+      }
+    ]
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    GetPageModel getPageModel = GetPageModel.fromJson(jsonResponse);
+
     return getPageModel;
   }
 
+
   Future<SocialLinkModel> getSocialLink() async {
-    // Hardcoded JSON response
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -263,7 +367,6 @@ class ApiService {
   }
   ''';
 
-    // Parse the hardcoded response into SocialLinkModel
     final jsonResponse = jsonDecode(hardcodedResponse);
     SocialLinkModel socialLinkModel = SocialLinkModel.fromJson(jsonResponse);
 
@@ -298,18 +401,51 @@ class ApiService {
   }
 
   Future<CategoryModel> category(pageNo) async {
-    CategoryModel categoryModel;
-    String apiname = "get_category";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'page_no': pageNo,
-        }));
-    categoryModel = CategoryModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Category list fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "name": "Mobile Development",
+        "image": "https://example.com/mobile_dev.jpg",
+        "status": 1,
+        "created_at": "2024-09-15",
+        "updated_at": "2024-09-16"
+      },
+      {
+        "id": 2,
+        "name": "Data Science",
+        "image": "https://example.com/data_science.jpg",
+        "status": 1,
+        "created_at": "2024-09-15",
+        "updated_at": "2024-09-16"
+      },
+      {
+        "id": 3,
+        "name": "Artificial Intelligence",
+        "image": "https://example.com/ai.jpg",
+        "status": 1,
+        "created_at": "2024-09-15",
+        "updated_at": "2024-09-16"
+      }
+    ],
+    "total_rows": 3,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    CategoryModel categoryModel = CategoryModel.fromJson(jsonResponse);
+
     return categoryModel;
   }
 
+
   Future<MyCourseModel> mycourse(pageno) async {
-    // Hardcoded JSON response
     const hardcodedResponse = '''
   {
     "status": 200,
@@ -416,138 +552,187 @@ class ApiService {
 /* Video By Category & Language */
 
   Future<VideobyIdModel> getContentbyCategoryId(categoryId, pageNo) async {
-  // Create a variable to store the hardcoded response based on the courseId and chapterId
-  var hardcodedVideoByChapterResponse;
+    var hardcodedVideoByChapterResponse;
 
-  // Condition to return different content based on the courseId or chapterId
-  if (categoryId == 10) {
-    // Content for the Flutter course (categoryId = 10)
-    hardcodedVideoByChapterResponse = {
-      "status": 200,
-      "message": "Success",
-      "result": [
-        {
-          "id": 1,
-          "course_id": categoryId,
-          "chapter_id": 1,
-          "title": "Flutter - Introduction",
-          "thumbnail_img": "https://example.com/flutter_thumbnail1.jpg",
-          "landscape_img": "https://example.com/flutter_landscape1.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 600,
-          "description": "Introduction to Flutter Development.",
-          "total_view": 1500,
-          "status": 1,
-          "created_at": "2024-09-15",
-          "updated_at": "2024-09-16",
-          "is_buy": 1,
-          "is_read": 1
-        },
-        {
-          "id": 2,
-          "course_id": categoryId,
-          "chapter_id": 2,
-          "title": "Flutter - Widgets",
-          "thumbnail_img": "https://example.com/flutter_thumbnail2.jpg",
-          "landscape_img": "https://example.com/flutter_landscape2.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 900,
-          "description": "Introduction to Widgets in Flutter.",
-          "total_view": 1000,
-          "status": 1,
-          "created_at": "2024-09-15",
-          "updated_at": "2024-09-16",
-          "is_buy": 1,
-          "is_read": 1
-        }
-      ],
-      "total_rows": 2,
-      "total_page": 1,
-      "current_page": 1,
-      "more_page": false
-    };
-  } else if (categoryId == 15) {
-    // Content for the Data Science course (categoryId = 15)
-    hardcodedVideoByChapterResponse = {
-      "status": 200,
-      "message": "Success",
-      "result": [
-        {
-          "id": 1,
-          "course_id": categoryId,
-          "chapter_id": 1,
-          "title": "Data Science - Python Introduction",
-          "thumbnail_img": "https://example.com/python_thumbnail1.jpg",
-          "landscape_img": "https://example.com/python_landscape1.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 1200,
-          "description": "Introduction to Data Science using Python.",
-          "total_view": 2300,
-          "status": 1,
-          "created_at": "2024-08-01",
-          "updated_at": "2024-09-18",
-          "is_buy": 1,
-          "is_read": 1
-        },
-        {
-          "id": 2,
-          "course_id": categoryId,
-          "chapter_id": 2,
-          "title": "Data Science - Pandas Overview",
-          "thumbnail_img": "https://example.com/python_thumbnail2.jpg",
-          "landscape_img": "https://example.com/python_landscape2.jpg",
-          "video_type": "mp4",
-          "video_url":
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          "duration": 1500,
-          "description": "Learn how to use Pandas for Data Science.",
-          "total_view": 2000,
-          "status": 1,
-          "created_at": "2024-08-01",
-          "updated_at": "2024-09-18",
-          "is_buy": 0,
-          "is_read": 1
-        }
-      ],
-      "total_rows": 2,
-      "total_page": 1,
-      "current_page": 1,
-      "more_page": false
-    };
-  }
+    if (categoryId == 10) {
+      // Content for the Flutter course (categoryId = 10)
+      hardcodedVideoByChapterResponse = {
+        "status": 200,
+        "message": "Success",
+        "result": [
+          {
+            "id": 1,
+            "course_id": categoryId,
+            "chapter_id": 1,
+            "title": "Flutter - Introduction",
+            "thumbnail_img": "https://example.com/flutter_thumbnail1.jpg",
+            "landscape_img": "https://example.com/flutter_landscape1.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 600,
+            "description": "Introduction to Flutter Development.",
+            "total_view": 1500,
+            "status": 1,
+            "created_at": "2024-09-15",
+            "updated_at": "2024-09-16",
+            "is_buy": 1,
+            "is_read": 1
+          },
+          {
+            "id": 2,
+            "course_id": categoryId,
+            "chapter_id": 2,
+            "title": "Flutter - Widgets",
+            "thumbnail_img": "https://example.com/flutter_thumbnail2.jpg",
+            "landscape_img": "https://example.com/flutter_landscape2.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 900,
+            "description": "Introduction to Widgets in Flutter.",
+            "total_view": 1000,
+            "status": 1,
+            "created_at": "2024-09-15",
+            "updated_at": "2024-09-16",
+            "is_buy": 1,
+            "is_read": 1
+          }
+        ],
+        "total_rows": 2,
+        "total_page": 1,
+        "current_page": 1,
+        "more_page": false
+      };
+    } else if (categoryId == 15) {
+      // Content for the Data Science course (categoryId = 15)
+      hardcodedVideoByChapterResponse = {
+        "status": 200,
+        "message": "Success",
+        "result": [
+          {
+            "id": 1,
+            "course_id": categoryId,
+            "chapter_id": 1,
+            "title": "Data Science - Python Introduction",
+            "thumbnail_img": "https://example.com/python_thumbnail1.jpg",
+            "landscape_img": "https://example.com/python_landscape1.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 1200,
+            "description": "Introduction to Data Science using Python.",
+            "total_view": 2300,
+            "status": 1,
+            "created_at": "2024-08-01",
+            "updated_at": "2024-09-18",
+            "is_buy": 1,
+            "is_read": 1
+          },
+          {
+            "id": 2,
+            "course_id": categoryId,
+            "chapter_id": 2,
+            "title": "Data Science - Pandas Overview",
+            "thumbnail_img": "https://example.com/python_thumbnail2.jpg",
+            "landscape_img": "https://example.com/python_landscape2.jpg",
+            "video_type": "mp4",
+            "video_url":
+                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "duration": 1500,
+            "description": "Learn how to use Pandas for Data Science.",
+            "total_view": 2000,
+            "status": 1,
+            "created_at": "2024-08-01",
+            "updated_at": "2024-09-18",
+            "is_buy": 0,
+            "is_read": 1
+          }
+        ],
+        "total_rows": 2,
+        "total_page": 1,
+        "current_page": 1,
+        "more_page": false
+      };
+    }
 
-  // Parse the hardcoded response into VideobyIdModel
-  final jsonResponse = jsonDecode(jsonEncode(hardcodedVideoByChapterResponse));
-  VideobyIdModel videobyIdModel = VideobyIdModel.fromJson(jsonResponse);
+    final jsonResponse =
+        jsonDecode(jsonEncode(hardcodedVideoByChapterResponse));
+    VideobyIdModel videobyIdModel = VideobyIdModel.fromJson(jsonResponse);
 
-  return videobyIdModel;
-}
-
-  Future<VideobyIdModel> getContentbyLanguageId(languageId, pageNo) async {
-    VideobyIdModel videobyIdModel;
-    String apiname = "get_content_by_language";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'language_id': languageId,
-          'page_no': pageNo,
-        }));
-    videobyIdModel = VideobyIdModel.fromJson(response.data);
     return videobyIdModel;
   }
 
+  Future<VideobyIdModel> getContentbyLanguageId(languageId, pageNo) async {
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Content fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 101,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Flutter for Beginners",
+        "description": "Learn the basics of Flutter development in this comprehensive course.",
+        "thumbnail_img": "https://example.com/flutter_thumbnail1.jpg",
+        "landscape_img": "https://example.com/flutter_landscape1.jpg",
+        "is_free": 1,
+        "price": 0,
+        "total_view": 1200,
+        "status": 1,
+        "created_at": "2024-09-01",
+        "updated_at": "2024-09-10",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.8",
+        "is_wishlist": 1
+      },
+      {
+        "id": 2,
+        "tutor_id": 102,
+        "category_id": 15,
+        "language_id": 1,
+        "title": "Data Science with Python",
+        "description": "Explore the world of data science using Python programming.",
+        "thumbnail_img": "https://example.com/python_thumbnail1.jpg",
+        "landscape_img": "https://example.com/python_landscape1.jpg",
+        "is_free": 0,
+        "price": 50,
+        "total_view": 2300,
+        "status": 1,
+        "created_at": "2024-08-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Data Science",
+        "language_name": "English",
+        "tutor_name": "Jane Smith",
+        "is_buy": 0,
+        "is_user_buy": 0,
+        "avg_rating": "4.9",
+        "is_wishlist": 0
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    VideobyIdModel videobyIdModel = VideobyIdModel.fromJson(jsonResponse);
+
+    return videobyIdModel;
+  }
+
+
   /* Detail Page All Api's Start */
 
-<<<<<<< HEAD
 Future<CourseDetailsModel> courseDetail(courseId) async {
-=======
-  Future<CourseDetailsModel> courseDetail(courseId) async {
->>>>>>> feature/update-course-layout
     // Create a hardcoded response matching the structure of CourseDetailsModel
     var hardcodedResponse = {
       "status": 200,
@@ -643,7 +828,6 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
       ]
     };
 
-    // Manually populate CourseDetailsModel using the hardcoded data
     CourseDetailsModel courseDetailsModel =
         CourseDetailsModel.fromJson(hardcodedResponse);
 
@@ -652,62 +836,156 @@ Future<CourseDetailsModel> courseDetail(courseId) async {
 
 
   Future<GetCourseReviewModel> courseReviewList(type, contentId, pageNo) async {
-    GetCourseReviewModel getCourseReviewModel;
-    String apiname = "get_review_by_content";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'type': type,
-          'content_id': contentId,
-          'page_no': pageNo,
-        }));
-    getCourseReviewModel = GetCourseReviewModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Course reviews fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "user_id": 101,
+        "course_id": 1,
+        "comment": "Great course, really helped me understand the basics of Flutter.",
+        "rating": 4.5,
+        "status": 1,
+        "created_at": "2024-09-01",
+        "updated_at": "2024-09-10",
+        "user_name": "john_doe",
+        "full_name": "John Doe",
+        "email": "john@example.com",
+        "image": "https://example.com/john_image.jpg"
+      },
+      {
+        "id": 2,
+        "user_id": 102,
+        "course_id": 1,
+        "comment": "Excellent content and very informative.",
+        "rating": 5.0,
+        "status": 1,
+        "created_at": "2024-08-01",
+        "updated_at": "2024-09-01",
+        "user_name": "jane_smith",
+        "full_name": "Jane Smith",
+        "email": "jane@example.com",
+        "image": "https://example.com/jane_image.jpg"
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    GetCourseReviewModel getCourseReviewModel =
+        GetCourseReviewModel.fromJson(jsonResponse);
+
     return getCourseReviewModel;
   }
 
+
   Future<SuccessModel> addContentView(type, contentId, videoId) async {
-    SuccessModel successModel;
-    String apiname = "add_content_view";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'type': type,
-          'content_id': contentId,
-          'video_id': videoId,
-        }));
-    successModel = SuccessModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Content view added successfully",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    SuccessModel successModel = SuccessModel.fromJson(jsonResponse);
+
     return successModel;
   }
 
   Future<SuccessModel> addVideoRead(courseId, videoId, chapterId) async {
-    SuccessModel successVideoReadModel;
-    String apiname = "add_video_read";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'course_id': courseId,
-          'chapter_id': chapterId,
-          'video_id': videoId,
-        }));
-    successVideoReadModel = SuccessModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Video read successfully added",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    SuccessModel successVideoReadModel = SuccessModel.fromJson(jsonResponse);
+
     return successVideoReadModel;
   }
 
   Future<RelatedCourseModel> relatedcourse(courseId, pageNo) async {
-    RelatedCourseModel relatedCourseModel;
-    String apiname = "get_related_course";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'course_id': courseId,
-          'page_no': pageNo,
-        }));
-    relatedCourseModel = RelatedCourseModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Related courses fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 101,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Advanced Flutter",
+        "description": "Take your Flutter skills to the next level.",
+        "thumbnail_img": "https://example.com/flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_landscape.jpg",
+        "is_free": 0,
+        "price": 199,
+        "total_view": 1200,
+        "status": 1,
+        "created_at": "2024-08-01",
+        "updated_at": "2024-09-01",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 0,
+        "avg_rating": "4.5",
+        "is_wishlist": 1,
+        "total_duration": 3600
+      },
+      {
+        "id": 2,
+        "tutor_id": 102,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Flutter for Beginners",
+        "description": "A comprehensive guide to start with Flutter.",
+        "thumbnail_img": "https://example.com/flutter_beginner_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_beginner_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "total_view": 1500,
+        "status": 1,
+        "created_at": "2024-07-01",
+        "updated_at": "2024-08-01",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "Jane Doe",
+        "is_buy": 1,
+        "avg_rating": "4.8",
+        "is_wishlist": 0,
+        "total_duration": 4200
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    RelatedCourseModel relatedCourseModel =
+        RelatedCourseModel.fromJson(jsonResponse);
+
     return relatedCourseModel;
   }
 
+
+
 Future<GetVideoByChapterModel> videoByChapter(
       courseId, chapterId, pageNo) async {
-    // Log the input parameters
     print(
         'DEBUG: Called videoByChapter with courseId: $courseId, chapterId: $chapterId, pageNo: $pageNo');
 
@@ -716,7 +994,6 @@ Future<GetVideoByChapterModel> videoByChapter(
     // Condition to return different content based on the courseId or chapterId
     if (int.parse(courseId.toString()) == 1 &&
         int.parse(chapterId.toString()) == 1) {
-
       print('DEBUG: Returning content for Course 1, Chapter 1');
 
       hardcodedVideoByChapterResponse = {
@@ -796,11 +1073,9 @@ Future<GetVideoByChapterModel> videoByChapter(
       };
     }
 
-    // Log the response before sanitization
     print(
         'DEBUG: Hardcoded response before sanitization: $hardcodedVideoByChapterResponse');
 
-    // Sanitize the result to ensure types are correct
     List<Map<String, dynamic>> sanitizedResults =
         (hardcodedVideoByChapterResponse["result"] as List).map((video) {
       return {
@@ -823,17 +1098,13 @@ Future<GetVideoByChapterModel> videoByChapter(
       };
     }).toList();
 
-    // Log the sanitized results
     print('DEBUG: Sanitized results: $sanitizedResults');
 
-    // Update the sanitized response back to the original structure
     hardcodedVideoByChapterResponse["result"] = sanitizedResults;
 
-    // Convert to GetVideoByChapterModel
     GetVideoByChapterModel getVideoByChapterModel =
         GetVideoByChapterModel.fromJson(hardcodedVideoByChapterResponse);
 
-    // Log the final model before returning
     print('DEBUG: Returning GetVideoByChapterModel: $getVideoByChapterModel');
 
     return getVideoByChapterModel;
@@ -842,29 +1113,35 @@ Future<GetVideoByChapterModel> videoByChapter(
   Future<SuccessModel> addContentReview(
       type, contentId, comment, rating) async {
     printLog("rating ==> $rating");
-    SuccessModel successModel;
-    String apiname = "add_content_review";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'type': type,
-          'content_id': contentId,
-          'comment': comment,
-          'rating': rating,
-        }));
-    successModel = SuccessModel.fromJson(response.data);
+
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Review added successfully",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    SuccessModel successModel = SuccessModel.fromJson(jsonResponse);
+
     return successModel;
   }
 
   Future<CertificateModel> fetchCertificate(courseId) async {
-    CertificateModel certificateModel;
-    String apiname = "download_certificate";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'course_id': courseId,
-        }));
-    certificateModel = CertificateModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Certificate fetched successfully",
+    "result": {
+      "pdf_url": "https://example.com/certificate.pdf"
+    }
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    CertificateModel certificateModel = CertificateModel.fromJson(jsonResponse);
+
     return certificateModel;
   }
 
@@ -873,28 +1150,82 @@ Future<GetVideoByChapterModel> videoByChapter(
   /* (Wishlist Api Start) */
 
   Future<Wishlistmodel> wishlist(type, pageno) async {
-    Wishlistmodel wishlistmodel;
-    String apiname = "get_wishlist_content";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'type': type,
-          'page_no': pageno,
-        }));
-    wishlistmodel = Wishlistmodel.fromJson(response.data);
-    return wishlistmodel;
+  const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Wishlist fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 123,
+        "category_id": 5,
+        "language_id": 1,
+        "title": "Flutter Development",
+        "description": "Learn how to develop apps with Flutter.",
+        "thumbnail_img": "https://example.com/flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "total_view": 2000,
+        "status": 1,
+        "created_at": "2024-01-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 0,
+        "is_user_buy": 0,
+        "avg_rating": "4.5"
+      },
+      {
+        "id": 2,
+        "tutor_id": 456,
+        "category_id": 6,
+        "language_id": 2,
+        "title": "Advanced Python",
+        "description": "Deep dive into Python programming.",
+        "thumbnail_img": "https://example.com/python_thumbnail.jpg",
+        "landscape_img": "https://example.com/python_landscape.jpg",
+        "is_free": 0,
+        "price": 50,
+        "total_view": 5000,
+        "status": 1,
+        "created_at": "2024-03-01",
+        "updated_at": "2024-09-20",
+        "category_name": "Programming",
+        "language_name": "Spanish",
+        "tutor_name": "Jane Smith",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.8"
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
   }
+  ''';
+
+  final jsonResponse = jsonDecode(hardcodedResponse);
+  Wishlistmodel wishlistmodel = Wishlistmodel.fromJson(jsonResponse);
+
+  return wishlistmodel;
+}
+
 
   Future<SuccessModel> addRemoveWishlist(type, contentId) async {
-    SuccessModel successModel;
-    String apiname = "add_remove_wishlist";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'type': type,
-          'content_id': contentId,
-        }));
-    successModel = SuccessModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Wishlist action successful",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    SuccessModel successModel = SuccessModel.fromJson(jsonResponse);
+
     return successModel;
   }
 
@@ -1022,18 +1353,20 @@ Future<GetVideoByChapterModel> videoByChapter(
   }
 
   Future<Addcommentmodel> addcomment(userid, videoid, courseid, comment) async {
-    Addcommentmodel addcommentmodel;
-    String apiname = "add_comment";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': userid,
-          'video_id': videoid,
-          'course_id': courseid,
-          'comment': comment,
-        }));
-    addcommentmodel = Addcommentmodel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Comment added successfully",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Addcommentmodel addcommentmodel = Addcommentmodel.fromJson(jsonResponse);
+
     return addcommentmodel;
   }
+
 
 /* Quize Api Start */
 
@@ -1073,7 +1406,7 @@ Future<GetVideoByChapterModel> videoByChapter(
     return saveQuestionReportModel;
   }
 
-/* Quize Api End */
+/* Quiz Api End */
 
   Future<SuccessModel> becomeTutor(
       String username,
@@ -1124,96 +1457,296 @@ Future<GetVideoByChapterModel> videoByChapter(
   }
 
   Future<NotificationModel> getNotification(pageNo) async {
-    NotificationModel notificationModel;
-    String apiname = "get_notification";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'page_no': pageNo,
-        }));
-    notificationModel = NotificationModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Notifications fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "title": "New Course Available",
+        "message": "Check out the new Flutter course we just added!",
+        "image": "https://example.com/course_image.jpg",
+        "status": 1,
+        "created_at": "2024-09-15",
+        "updated_at": "2024-09-15"
+      },
+      {
+        "id": 2,
+        "title": "Limited Time Offer",
+        "message": "Get 50% off on all premium courses.",
+        "image": "https://example.com/offer_image.jpg",
+        "status": 1,
+        "created_at": "2024-09-10",
+        "updated_at": "2024-09-10"
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    NotificationModel notificationModel =
+        NotificationModel.fromJson(jsonResponse);
+
     return notificationModel;
   }
 
+
   Future<SuccessModel> readNotification(notificationId) async {
-    SuccessModel successModel;
-    String apiname = "read_notification";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'notification_id': notificationId,
-        }));
-    successModel = SuccessModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Notification marked as read successfully",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    SuccessModel successModel = SuccessModel.fromJson(jsonResponse);
+
     return successModel;
   }
+
 
 /* Books Related APi Start */
 
   Future<EbookModel> bookList(pageNo) async {
-    EbookModel getEbookModel;
-    String apiname = "get_latest_book";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'page_no': pageNo,
-        }));
-    getEbookModel = EbookModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Books fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 101,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Learn Flutter",
+        "book_url": "https://example.com/flutter_book.pdf",
+        "thumbnail_img": "https://example.com/flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "description": "This book covers Flutter basics.",
+        "summary": "Learn how to build cross-platform mobile apps using Flutter.",
+        "specification": "PDF, 150 pages",
+        "total_view": 1500,
+        "status": 1,
+        "created_at": "2024-09-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.8",
+        "is_wishlist": 0
+      },
+      {
+        "id": 2,
+        "tutor_id": 102,
+        "category_id": 11,
+        "language_id": 2,
+        "title": "Advanced Dart",
+        "book_url": "https://example.com/dart_book.pdf",
+        "thumbnail_img": "https://example.com/dart_thumbnail.jpg",
+        "landscape_img": "https://example.com/dart_landscape.jpg",
+        "is_free": 0,
+        "price": 10,
+        "description": "This book covers advanced Dart programming.",
+        "summary": "Master the Dart language with advanced concepts.",
+        "specification": "PDF, 200 pages",
+        "total_view": 2500,
+        "status": 1,
+        "created_at": "2024-08-01",
+        "updated_at": "2024-09-10",
+        "category_name": "Programming",
+        "language_name": "Spanish",
+        "tutor_name": "Jane Smith",
+        "is_buy": 0,
+        "is_user_buy": 0,
+        "avg_rating": "4.9",
+        "is_wishlist": 1
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    EbookModel getEbookModel = EbookModel.fromJson(jsonResponse);
+
     return getEbookModel;
   }
 
+
+
   Future<EbookDetailModel> bookDetail(bookId) async {
-    EbookDetailModel ebookDetailModel;
-    String apiname = "book_detail";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'book_id': bookId,
-        }));
-    ebookDetailModel = EbookDetailModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Book details fetched successfully",
+    "result": [
+      {
+        "id": 1,
+        "tutor_id": 101,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Learn Flutter",
+        "book_url": "https://example.com/flutter_book.pdf",
+        "thumbnail_img": "https://example.com/flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "description": "This book covers Flutter basics.",
+        "summary": "Learn how to build cross-platform mobile apps using Flutter.",
+        "specification": "PDF, 150 pages",
+        "total_view": 1500,
+        "status": 1,
+        "created_at": "2024-09-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Doe",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.8",
+        "is_wishlist": 0
+      }
+    ]
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    EbookDetailModel ebookDetailModel = EbookDetailModel.fromJson(jsonResponse);
+
     return ebookDetailModel;
   }
 
+
   Future<RelatedBookModel> relatedBooks(bookId, pageNo) async {
-    RelatedBookModel relatedBookModel;
-    String apiname = "get_related_book";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'book_id': bookId,
-          'page_no': pageNo,
-        }));
-    relatedBookModel = RelatedBookModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Related books fetched successfully",
+    "result": [
+      {
+        "id": 2,
+        "tutor_id": 101,
+        "category_id": 10,
+        "language_id": 1,
+        "title": "Advanced Flutter",
+        "book_url": "https://example.com/advanced_flutter.pdf",
+        "thumbnail_img": "https://example.com/advanced_flutter_thumbnail.jpg",
+        "landscape_img": "https://example.com/advanced_flutter_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "description": "A comprehensive guide to advanced Flutter concepts.",
+        "summary": "This book dives deeper into advanced Flutter development.",
+        "specification": "PDF, 200 pages",
+        "total_view": 2000,
+        "status": 1,
+        "created_at": "2024-09-02",
+        "updated_at": "2024-09-16",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "Jane Doe",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.9",
+        "is_wishlist": 0
+      },
+      {
+        "id": 3,
+        "tutor_id": 102,
+        "category_id": 12,
+        "language_id": 2,
+        "title": "Flutter for Beginners",
+        "book_url": "https://example.com/flutter_beginners.pdf",
+        "thumbnail_img": "https://example.com/flutter_beginners_thumbnail.jpg",
+        "landscape_img": "https://example.com/flutter_beginners_landscape.jpg",
+        "is_free": 1,
+        "price": 0,
+        "description": "A beginner's guide to Flutter development.",
+        "summary": "This book covers the basics of Flutter development.",
+        "specification": "PDF, 100 pages",
+        "total_view": 1000,
+        "status": 1,
+        "created_at": "2024-09-01",
+        "updated_at": "2024-09-15",
+        "category_name": "Mobile Development",
+        "language_name": "English",
+        "tutor_name": "John Smith",
+        "is_buy": 1,
+        "is_user_buy": 1,
+        "avg_rating": "4.7",
+        "is_wishlist": 1
+      }
+    ],
+    "total_rows": 2,
+    "total_page": 1,
+    "current_page": 1,
+    "more_page": false
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    RelatedBookModel relatedBookModel = RelatedBookModel.fromJson(jsonResponse);
+
     return relatedBookModel;
   }
 
+
   Future<Buybookmodel> buybook(bookId, amount, userid) async {
-    printLog("Api Service ==>$userid");
-    Buybookmodel buybookmodel;
-    String apiname = "buy_book";
-    printLog("userid==>${Constant.userID}");
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'user_id': Constant.userID,
-          'book_id': bookId,
-          'total_amount': amount,
-        }));
-    buybookmodel = Buybookmodel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Book purchased successfully",
+    "result": []
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    Buybookmodel buybookmodel = Buybookmodel.fromJson(jsonResponse);
+
     return buybookmodel;
   }
+
 
 /* Books Related Api End */
 
   /* Blog Related Api Start */
 
   Future<BlogDetailModel> blogDetail(blogId) async {
-    BlogDetailModel blogDetailModel;
-    String apiname = "blog_detail";
-    Response response = await dio.post('$baseUrl$apiname',
-        data: FormData.fromMap({
-          'blog_id': blogId,
-        }));
-    blogDetailModel = BlogDetailModel.fromJson(response.data);
+    const hardcodedResponse = '''
+  {
+    "status": 200,
+    "message": "Blog detail fetched successfully",
+    "result": {
+      "id": 1,
+      "title": "Introduction to Flutter",
+      "content": "This blog post provides an introduction to Flutter and its features.",
+      "image": "https://example.com/flutter_blog_image.jpg",
+      "author": "John Doe",
+      "created_at": "2024-09-15",
+      "updated_at": "2024-09-16"
+    }
+  }
+  ''';
+
+    final jsonResponse = jsonDecode(hardcodedResponse);
+    BlogDetailModel blogDetailModel = BlogDetailModel.fromJson(jsonResponse);
+
     return blogDetailModel;
   }
+
 
   /* Blog Related Api End */
 

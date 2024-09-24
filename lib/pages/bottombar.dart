@@ -31,7 +31,7 @@ class BottombarState extends State<Bottombar> {
   SharedPre sharedpre = SharedPre();
   late GeneralProvider generalProvider;
   late ProfileProvider profileProvider;
-  int selectedIndex = 0;
+  int selectedIndex = 2;
   String userid = "";
   String currencycode = "";
 
