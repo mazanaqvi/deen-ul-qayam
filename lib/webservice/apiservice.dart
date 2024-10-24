@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
+import 'package:logger/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -49,8 +50,12 @@ import 'package:yourappname/model/wishlistmodel.dart';
 import 'package:yourappname/utils/constant.dart';
 import 'package:path/path.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
+
 import 'package:yourappname/model/getvideobychapter.dart' as episode;
 import 'package:yourappname/model/coursedetailsmodel.dart' as contentdetails;
+
+import '../model/video_api_response.dart';
 
 class ApiService {
   String baseUrl = Constant.baseurl;
@@ -724,6 +729,63 @@ class ApiService {
 
     return videobyIdModel;
   }
+
+
+Future<VideoApiResponse?> getLessonsData() async {
+    final String apiUrl =
+        "http://lms.deenulqayyim.com/modules/module_elms/assets/xelms_main.php";
+
+    var response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: {
+        'login': 'Dars32',
+        'password': '123456',
+      },
+    );
+
+
+    if (response.statusCode == 200) {
+      String responseBody = response.body;
+
+      // Check if the response is in PHP array format and needs parsing
+      if (responseBody.contains("array")) {
+        print("Response is not in JSON format, attempting to parse.");
+
+        // Example: crude string manipulation (you may need to adapt this)
+        // 1. Remove "array(2) {" etc.
+        responseBody = responseBody
+            .replaceAllMapped(RegExp(r"array\(\d+\) \{"), (match) => "{")
+            .replaceAll("=>", ":")
+            .replaceAll("}", "}"); // Simplify to JSON
+
+        // You may need more processing depending on the structure of the response
+
+        print("Modified response: $responseBody");
+
+        try {
+          // Now parse the cleaned-up response string as JSON
+          var jsonResponse = json.decode(responseBody);
+
+          // Return the parsed VideoApiResponse object
+          return VideoApiResponse.fromJson(jsonResponse);
+        } catch (e) {
+          print("Error parsing modified response: $e");
+        }
+      } else {
+        print("Response is already in JSON format: ${response.body}");
+        return VideoApiResponse.fromJson(json.decode(response.body));
+      }
+    } else {
+      print("Failed to load data: ${response.statusCode}");
+      return null;
+    }
+  }
+
+
+
 
   /* Detail Page All Api's Start */
 

@@ -1,7 +1,7 @@
 import 'package:yourappname/pages/nodata.dart';
 import 'package:yourappname/provider/coursedetailsprovider.dart';
 import 'package:yourappname/provider/quizeprovider.dart';
-import 'package:yourappname/quize/leaderboard.dart';
+import 'package:yourappname/quiz/leaderboard.dart';
 import 'package:yourappname/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

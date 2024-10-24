@@ -1,6 +1,6 @@
 import 'package:yourappname/pages/nodata.dart';
 import 'package:yourappname/provider/coursedetailsprovider.dart';
-import 'package:yourappname/quize/quize.dart';
+import 'package:yourappname/quiz/quiz.dart';
 import 'package:yourappname/subscription/allpayment.dart';
 import 'package:yourappname/utils/color.dart';
 import 'package:yourappname/utils/constant.dart';

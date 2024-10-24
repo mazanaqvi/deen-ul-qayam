@@ -1,13 +1,16 @@
+
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-
+import 'package:yourappname/pages/lesson_detail.dart';
+import 'package:yourappname/model/video_api_response.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yourappname/pages/detail.dart';
 import 'package:yourappname/pages/nodata.dart';
 import 'package:yourappname/provider/mycourseprovider.dart';
+import 'package:yourappname/provider/lessonsprovider.dart';
 import 'package:yourappname/utils/adhelper.dart';
 import 'package:yourappname/utils/color.dart';
 import 'package:yourappname/utils/constant.dart';
@@ -22,6 +25,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
 import 'package:path/path.dart' as path;
+import 'package:yourappname/model/lesson_model.dart';
 
 class MyCourse extends StatefulWidget {
   const MyCourse({Key? key}) : super(key: key);
@@ -32,28 +36,26 @@ class MyCourse extends StatefulWidget {
 
 class MyCourseState extends State<MyCourse> {
   late MyCourseProvider myCourseProvider;
+  late LessonsProvider lessonsProvider; // Declare lessonsProvider
   late ScrollController _scrollController;
   double? width;
   double? height;
 
-  /* Download Certificate */
-  final ReceivePort _port = ReceivePort();
-  dynamic _tasks;
-  int progress = 0;
-
   @override
   void initState() {
-    if (!kIsWeb) {
-      /* Download init ****/
-      _bindBackgroundIsolate();
-      FlutterDownloader.registerCallback(downloadCallback, step: 1);
-      /* ****/
-    }
+    // Initialize providers and other initializations
     myCourseProvider = Provider.of<MyCourseProvider>(context, listen: false);
+    lessonsProvider = LessonsProvider();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     super.initState();
     _fetchData(0);
+  }
+
+  // Add Lessons Fetch function
+  Future<void> _fetchLessons() async {
+    await lessonsProvider.fetchLessons(); 
+    // print
   }
 
   _scrollListener() async {
@@ -71,6 +73,7 @@ class MyCourseState extends State<MyCourse> {
   Future<void> _fetchData(int? nextPage) async {
     await myCourseProvider.getMyCourse((nextPage ?? 0) + 1);
     await myCourseProvider.setLoadMore(false);
+    await _fetchLessons(); // Fetch lessons along with course data
   }
 
   @override
@@ -79,77 +82,12 @@ class MyCourseState extends State<MyCourse> {
     super.dispose();
   }
 
-  /* ======== Download Start=========== */
-
-  void _bindBackgroundIsolate() {
-    final isSuccess = IsolateNameServer.registerPortWithName(
-      _port.sendPort,
-      'downloader_send_port',
-    );
-    if (!isSuccess) {
-      _unbindBackgroundIsolate();
-      _bindBackgroundIsolate();
-      return;
-    }
-    _port.listen((dynamic data) {
-      final taskId = (data as List<dynamic>)[0] as String;
-      final status = data[1] as int;
-      final progress = data[2] as int;
-
-      printLog(
-        'Callback on UI isolate: '
-        'task ($taskId) is in status ($status) and process ($progress)',
-      );
-
-      if (_tasks != null && _tasks!.isNotEmpty) {
-        final task = _tasks!.firstWhere((task) => task.taskId == taskId);
-        printLog(task.toString());
-
-        if (progress > 0) {
-          printLog("progress==>${progress.toString()}%");
-          myCourseProvider.setDownloadProgress(progress);
-        }
-      }
-    });
-  }
-
-  void _unbindBackgroundIsolate() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-  }
-
-  @pragma('vm:entry-point')
-  static void downloadCallback(
-    String id,
-    int status,
-    int progress,
-  ) {
-    printLog(
-      'Callback on background isolate: '
-      'task ($id) is in status ($status) and process ($progress)',
-    );
-
-    if (!kIsWeb) {
-      IsolateNameServer.lookupPortByName(Constant.videoDownloadPort)
-          ?.send([id, status, progress]);
-    }
-  }
-
-/* ======== Download End =========== */
-
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     return Scaffold(
-      // backgroundColor: white,
       appBar: AppBar(
-        elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: colorPrimary,
-        ),
-        centerTitle: false,
-        backgroundColor: colorPrimary,
-        automaticallyImplyLeading: false,
         title: MyText(
             color: white,
             text: "mycourse",
@@ -161,13 +99,17 @@ class MyCourseState extends State<MyCourse> {
             fontstyle: FontStyle.normal,
             multilanguage: true),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        controller: _scrollController,
-        child: Column(
-          children: [
-            buildPage(),
-          ],
+      body: ChangeNotifierProvider.value(
+        value: lessonsProvider,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          controller: _scrollController,
+          child: Column(
+            children: [
+              buildPage(),
+              buildLessonsSection(), // New method to display lessons
+            ],
+          ),
         ),
       ),
     );
@@ -208,6 +150,75 @@ class MyCourseState extends State<MyCourse> {
     });
   }
 
+  Widget buildLessonsSection() {
+    return Consumer<LessonsProvider>(
+      builder: (context, lessonsProvider, child) {
+        if (lessonsProvider.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (lessonsProvider.lessonsList.isEmpty) {
+          return const NoData();
+        } else {
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: lessonsProvider.lessonsList.length,
+            itemBuilder: (context, index) {
+              final lesson = lessonsProvider.lessonsList[index];
+              print("Navigating to Detail with lesson.name: ${lesson.name}");
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: InkWell(
+                  onTap: () {
+                    // Display fullscreen ad and navigate to LessonDetail
+                    AdHelper.showFullscreenAd(
+                      context,
+                      Constant.interstialAdType,
+                      () {
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder: (BuildContext context,
+                                Animation<double> animation,
+                                Animation<double> secondaryAnimation) {
+                              return Detail(
+                                courseId: lesson.name ??
+                                    "Unknown", // Use name as courseId
+                                isLesson: true,
+                              );
+                            },
+                            transitionsBuilder: (BuildContext context,
+                                Animation<double> animation,
+                                Animation<double> secondaryAnimation,
+                                Widget child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: ListTile(
+                    title: Text(
+                      lesson.name ?? 'No Title',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                  ),
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
+
   Widget mycourselist() {
     return MediaQuery.removePadding(
       context: context,
@@ -237,9 +248,12 @@ class MyCourseState extends State<MyCourse> {
                           Animation<double> animation,
                           Animation<double> secondaryAnimation) {
                         return Detail(
-                            courseId: myCourseProvider.mycourseList?[index].id
-                                    .toString() ??
-                                "");
+                          courseId: myCourseProvider.mycourseList?[index].id
+                                  .toString() ??
+                              "",
+                          isLesson:
+                              false, // Explicitly indicating it's a course
+                        );
                       },
                       transitionsBuilder: (BuildContext context,
                           Animation<double> animation,
@@ -294,64 +308,6 @@ class MyCourseState extends State<MyCourse> {
                                   overflow: TextOverflow.ellipsis,
                                   textalign: TextAlign.left,
                                   fontstyle: FontStyle.normal),
-                              const SizedBox(height: 8),
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.start,
-                              //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //   children: [
-                              //     MyText(
-                              //         color: gray,
-                              //         text: Utils.kmbGenerator(
-                              //           int.parse(myCourseProvider
-                              //                   .mycourseList?[index].totalView
-                              //                   .toString() ??
-                              //               ""),
-                              //         ),
-                              //         fontsizeNormal: Dimens.textSmall,
-                              //         fontwaight: FontWeight.w500,
-                              //         maxline: 1,
-                              //         overflow: TextOverflow.ellipsis,
-                              //         textalign: TextAlign.left,
-                              //         fontstyle: FontStyle.normal),
-                              //     const SizedBox(width: 5),
-                              //     // MyText(
-                              //     //     color: gray,
-                              //     //     text: "students",
-                              //     //     fontsizeNormal: Dimens.textSmall,
-                              //     //     fontwaight: FontWeight.w500,
-                              //     //     maxline: 1,
-                              //     //     multilanguage: true,
-                              //     //     overflow: TextOverflow.ellipsis,
-                              //     //     textalign: TextAlign.left,
-                              //     //     fontstyle: FontStyle.normal),
-                              //   ],
-                              // ),
-                              // const SizedBox(height: 8),
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.start,
-                              //   children: [
-                              //     MyRating(
-                              //       size: 13,
-                              //       rating: double.parse(myCourseProvider
-                              //               .mycourseList?[index].avgRating
-                              //               .toString() ??
-                              //           ""),
-                              //       spacing: 2,
-                              //     ),
-                              //     const SizedBox(width: 5),
-                              //     MyText(
-                              //         color: colorAccent,
-                              //         text:
-                              //             "${double.parse(myCourseProvider.mycourseList?[index].avgRating.toString() ?? "")}",
-                              //         fontsizeNormal: Dimens.textBigSmall,
-                              //         fontwaight: FontWeight.w600,
-                              //         maxline: 2,
-                              //         overflow: TextOverflow.ellipsis,
-                              //         textalign: TextAlign.left,
-                              //         fontstyle: FontStyle.normal),
-                              //   ],
-                              // ),
-                              // Hiding the Download Certificate Option
                             ],
                           ),
                         ),

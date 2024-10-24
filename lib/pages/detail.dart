@@ -9,8 +9,9 @@ import 'package:yourappname/model/download_item.dart';
 import 'package:yourappname/pages/login.dart';
 import 'package:yourappname/pages/nodata.dart';
 import 'package:yourappname/provider/coursedetailsprovider.dart';
+import 'package:yourappname/provider/lessonsprovider.dart';
 import 'package:yourappname/provider/showdownloadprovider.dart';
-import 'package:yourappname/quize/quize.dart';
+import 'package:yourappname/quiz/quiz.dart';
 import 'package:yourappname/subscription/allpayment.dart';
 import 'package:yourappname/utils/adhelper.dart';
 import 'package:yourappname/utils/color.dart';
@@ -34,10 +35,19 @@ import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
 import 'package:path/path.dart' as path;
+import 'package:yourappname/model/lesson_model.dart';
+import 'package:video_player/video_player.dart';
 
 class Detail extends StatefulWidget {
   final String courseId;
-  const Detail({Key? key, required this.courseId}) : super(key: key);
+
+  final bool isLesson; // New parameter
+
+  const Detail({
+    Key? key,
+    required this.courseId,
+    this.isLesson = false, // Default to false
+  }) : super(key: key);
 
   @override
   State<Detail> createState() => _DetailState();
@@ -50,8 +60,12 @@ class _DetailState extends State<Detail> {
   late Box<EpisodeItem> episodeBox;
 
   late CourseDetailsProvider detailProvider;
+  late LessonsProvider lessonsProvider;
   late ShowDownloadProvider downloadProvider;
   late ScrollController _scrollController;
+  late VideoPlayerController _controller;
+
+
   final commentController = TextEditingController();
   double addrating = 0.0;
   final ReceivePort _port = ReceivePort();
@@ -60,6 +74,13 @@ class _DetailState extends State<Detail> {
 
   @override
   void initState() {
+    _controller = VideoPlayerController.networkUrl(
+      Uri.parse(
+          'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'),
+    )..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized
+        setState(() {});
+      });
     /* Initilize Hive */
     if (Constant.userID != null) {
       downloadBox = Hive.box<DownloadItem>(
@@ -85,10 +106,27 @@ class _DetailState extends State<Detail> {
     downloadProvider =
         Provider.of<ShowDownloadProvider>(context, listen: false);
 
+    lessonsProvider = Provider.of<LessonsProvider>(context, listen: false);
+
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     super.initState();
     getApi();
+    if (widget.isLesson) {
+      fetchLessonDetails();
+    } else {
+      fetchCourseDetails();
+    }
+  }
+
+  Future<void> fetchCourseDetails() async {
+    await detailProvider.getCourseDetails(widget.courseId);
+    getRelatedList(0);
+    getReviewList(0);
+  }
+
+  Future<void> fetchLessonDetails() async {
+    await lessonsProvider.fetchLessons();
   }
 
   _scrollListener() async {
@@ -198,271 +236,385 @@ class _DetailState extends State<Detail> {
   void dispose() {
     detailProvider.clearProvider();
     downloadProvider.clearProvider();
+    lessonsProvider.clearProvider();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    printLog("taskId====>${detailProvider.taskId} ");
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        leading: InkWell(
-          splashColor: transparentColor,
-          focusColor: transparentColor,
-          hoverColor: transparentColor,
-          highlightColor: transparentColor,
-          onTap: () {
-            Navigator.of(context).pop(false);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Align(
-              alignment: Alignment.center,
-              child: MyImage(
-                width: 15,
-                height: 15,
-                imagePath: "ic_back.png",
-                color: Theme.of(context).colorScheme.surface,
+   Widget build(BuildContext context) {
+    if (widget.isLesson) {
+      // Refactored UI for the lesson to match course UI structure
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          leading: InkWell(
+            splashColor: Colors.transparent,
+            onTap: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(5),
+              child: Align(
+                alignment: Alignment.center,
+                child: Icon(Icons.arrow_back), // Customize icon
               ),
             ),
           ),
-        ),
-        actions: [
-          Consumer<CourseDetailsProvider>(
-              builder: (context, detailprovider, child) {
-            return Padding(
-              padding: const EdgeInsets.all(5),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                      splashColor: transparentColor,
-                      focusColor: transparentColor,
-                      hoverColor: transparentColor,
-                      highlightColor: transparentColor,
-                      borderRadius: BorderRadius.circular(50),
-                      onTap: () async {
-                        AdHelper.showFullscreenAd(
-                            context, Constant.interstialAdType, () async {
-                          if (Constant.userID == null) {
-                            Navigator.of(context).push(
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        const Login(),
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  const begin = Offset(1.0, 0.0);
-                                  const end = Offset.zero;
-                                  const curve = Curves.ease;
-
-                                  var tween = Tween(begin: begin, end: end)
-                                      .chain(CurveTween(curve: curve));
-
-                                  return SlideTransition(
-                                    position: animation.drive(tween),
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
-                          } else {
-                            await detailprovider.addRemoveWishlist(
-                                "3",
-                                detailprovider.courseDetailsModel.result?[0].id
-                                        .toString() ??
-                                    "");
-                          }
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Icon(
-                          detailprovider.courseDetailsModel.result?[0]
-                                      .isWishlist ==
-                                  1
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          color: detailprovider.courseDetailsModel.result?[0]
-                                      .isWishlist ==
-                                  1
-                              ? red
-                              : Theme.of(context).colorScheme.surface,
+          actions: [
+            Consumer<LessonsProvider>(
+              builder: (context, lessonsProvider, child) {
+                return Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () async {
+                          // Logic for adding/removing lesson from wishlist
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          // child: Icon(
+                          //   // lessonsProvider.lessonDetails?.isWishlist == 1
+                          //       // ? Icons.favorite
+                          //       // : Icons.favorite_border,
+                          //   // color:
+                          //       // lessonsProvider.lessonDetails?.isWishlist == 1
+                          //           // ? Colors.red
+                          //           // : Theme.of(context).colorScheme.surface,
+                          // ),
                         ),
                       ),
-                    ),
-                    InkWell(
-                      splashColor: transparentColor,
-                      focusColor: transparentColor,
-                      hoverColor: transparentColor,
-                      highlightColor: transparentColor,
-                      borderRadius: BorderRadius.circular(50),
-                      onTap: () async {
-                        AdHelper.showFullscreenAd(
-                            context, Constant.interstialAdType, () {
-                          if (Constant.userID == null) {
-                            /* Login Page Redirect  */
-                            Navigator.of(context).push(
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        const Login(),
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  const begin = Offset(1.0, 0.0);
-                                  const end = Offset.zero;
-                                  const curve = Curves.ease;
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () async {
+                          // Logic for sharing the lesson details
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Icon(
+                            Icons.share, // Customize icon
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        body: Consumer<LessonsProvider>(
+          builder: (context, lessonsProvider, child) {
+            if (lessonsProvider.loading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (lessonsProvider.lessonsList.isEmpty) {
+              return const NoData();
+            } else {
+              List<Lesson> matchingLessons = lessonsProvider.lessonsList
+                  .where((lesson) => lesson.name == widget.courseId)
+                  .toList();
 
-                                  var tween = Tween(begin: begin, end: end)
-                                      .chain(CurveTween(curve: curve));
+              if (matchingLessons.isEmpty) {
+                return const NoData();
+              } else {
+                Lesson lesson = matchingLessons.first;
 
-                                  return SlideTransition(
-                                    position: animation.drive(tween),
-                                    child: child,
-                                  );
-                                },
+                return Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.all(15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Reuse the same UI components as the course UI for consistent design
+                            Text(
+                              lesson.name ?? 'No Name',
+                              style: const TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
                               ),
-                            );
-                          } else {
-                            if (detailProvider
-                                        .courseDetailsModel.result?[0].isFree ==
-                                    0 &&
-                                detailProvider.courseDetailsModel.result?[0]
-                                        .isUserBuy !=
-                                    1) {
-                              /* Primium Page  */
-                              Navigator.of(context).push(
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation,
-                                          secondaryAnimation) =>
-                                      AllPayment(
-                                    /* ContentType 1 == Book */
-                                    /* ContentType 2 == Course */
-                                    contentType: "2",
-                                    payType: 'Content',
-                                    itemId: detailProvider
-                                            .courseDetailsModel.result?[0].id
-                                            .toString() ??
-                                        "",
-                                    price: detailProvider
-                                            .courseDetailsModel.result?[0].price
-                                            .toString() ??
-                                        "",
-                                    itemTitle: detailProvider
-                                            .courseDetailsModel.result?[0].title
-                                            .toString() ??
-                                        "",
-                                    typeId: "",
-                                    videoType: "",
-                                    productPackage: "",
-                                    currency: Constant.currency,
-                                    coin: "",
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              lesson.description ?? 'No Description',
+                              style: const TextStyle(fontSize: 16.0),
+                            ),
+                            const SizedBox(height: 20),
+                            _controller.value.isInitialized
+                                ? AspectRatio(
+                                    aspectRatio: _controller.value.aspectRatio,
+                                    child: VideoPlayer(_controller),
+                                  )
+                                : const Center(
+                                    child: CircularProgressIndicator()),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    _controller.value.isPlaying
+                                        ? Icons.pause
+                                        : Icons.play_arrow,
                                   ),
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    const begin = Offset(1.0, 0.0);
-                                    const end = Offset.zero;
-                                    const curve = Curves.ease;
-
-                                    var tween = Tween(begin: begin, end: end)
-                                        .chain(CurveTween(curve: curve));
-
-                                    return SlideTransition(
-                                      position: animation.drive(tween),
-                                      child: child,
-                                    );
+                                  onPressed: () {
+                                    setState(() {
+                                      _controller.value.isPlaying
+                                          ? _controller.pause()
+                                          : _controller.play();
+                                    });
                                   },
                                 ),
-                              );
-                            } else {
-                              /* Add Rating Succsess */
-                              addReviewBottomSheet(
-                                context,
-                                detailProvider.courseDetailsModel.result?[0].id
-                                        .toString() ??
-                                    "",
-                              );
-                            }
-                          }
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Icon(
-                          Icons.star_border,
-                          color: Theme.of(context).colorScheme.surface,
+                                const Text("Play/Pause Video"),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    InkWell(
-                      splashColor: transparentColor,
-                      focusColor: transparentColor,
-                      hoverColor: transparentColor,
-                      highlightColor: transparentColor,
-                      borderRadius: BorderRadius.circular(50),
-                      onTap: () {
-                        AdHelper.showFullscreenAd(
-                            context, Constant.interstialAdType, () {
-                          Utils.shareApp(Platform.isIOS
-                              ? "Hey! I'm Watching ${detailProvider.courseDetailsModel.result?[0].title.toString()}. Check it out now on ${Constant.appName}! \nhttps://apps.apple.com/us/app/${Constant.appName.toLowerCase()}/${Constant.appPackageName} \n"
-                              : "Hey! I'm Watching ${detailProvider.courseDetailsModel.result?[0].title.toString()}. Check it out now on ${Constant.appName}! \nhttps://play.google.com/store/apps/details?id=${Constant.appPackageName} \n");
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: MyImage(
-                          width: 18,
-                          height: 18,
-                          imagePath: "ic_rightturn.png",
-                          color: Theme.of(context).colorScheme.surface,
-                        ),
-                      ),
-                    ),
+                    Utils.showBannerAd(context),
+                    // buildBottomButton(), // Implement similar bottom button structure
                   ],
-                ),
+                );
+              }
+            }
+          },
+        ),
+      );
+    } else {
+      // Existing course detail UI
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          leading: InkWell(
+            splashColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            onTap: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(5),
+              child: Align(
+                alignment: Alignment.center,
+                child: Icon(Icons.arrow_back), // Replace with your custom icon
               ),
-            );
-          }),
-        ],
-      ),
-      body: Consumer<CourseDetailsProvider>(
-          builder: (context, detailprovider, child) {
-        if (detailprovider.loading) {
-          return commanShimmer();
-        } else {
-          if (detailprovider.courseDetailsModel.status == 200) {
-            return Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.all(15),
-                    scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        parentConainer(),
-                        childContainer(),
-                      ],
-                    ),
+            ),
+          ),
+          actions: [
+            Consumer<CourseDetailsProvider>(
+              builder: (context, detailprovider, child) {
+                return Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(50),
+                        onTap: () async {
+                          AdHelper.showFullscreenAd(
+                            context,
+                            Constant.interstialAdType,
+                            () async {
+                              if (Constant.userID == null) {
+                                Navigator.of(context).push(
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation, secondaryAnimation) =>
+                                        const Login(),
+                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                      const begin = Offset(1.0, 0.0);
+                                      const end = Offset.zero;
+                                      const curve = Curves.ease;
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
+                              } else {
+                                await detailprovider.addRemoveWishlist(
+                                  "3",
+                                  detailprovider.courseDetailsModel.result?[0].id.toString() ?? "",
+                                );
+                              }
+                            },
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Icon(
+                            detailprovider.courseDetailsModel.result?[0].isWishlist == 1
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: detailprovider.courseDetailsModel.result?[0].isWishlist == 1
+                                ? Colors.red
+                                : Theme.of(context).colorScheme.surface,
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(50),
+                        onTap: () async {
+                          AdHelper.showFullscreenAd(
+                            context,
+                            Constant.interstialAdType,
+                            () {
+                              if (Constant.userID == null) {
+                                Navigator.of(context).push(
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation, secondaryAnimation) =>
+                                        const Login(),
+                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                      const begin = Offset(1.0, 0.0);
+                                      const end = Offset.zero;
+                                      const curve = Curves.ease;
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+
+                                      return SlideTransition(
+                                        position: animation.drive(tween),
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
+                              } else {
+                                if (detailprovider.courseDetailsModel.result?[0].isFree == 0 &&
+                                    detailprovider.courseDetailsModel.result?[0].isUserBuy != 1) {
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation, secondaryAnimation) => AllPayment(
+                                        contentType: "2",
+                                        payType: 'Content',
+                                        itemId: detailprovider.courseDetailsModel.result?[0].id.toString() ?? "",
+                                        price: detailprovider.courseDetailsModel.result?[0].price.toString() ?? "",
+                                        itemTitle: detailprovider.courseDetailsModel.result?[0].title.toString() ?? "",
+                                        currency: Constant.currency,
+                                        coin: "yourCoinValue", // Provide a value
+                                        typeId: "yourTypeIdValue", // Provide a value
+                                        videoType: "yourVideoTypeValue", // Provide a value
+                                        productPackage: "yourProductPackageValue", // Provide a value
+                                      ),
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        const begin = Offset(1.0, 0.0);
+                                        const end = Offset.zero;
+                                        const curve = Curves.ease;
+                                        var tween = Tween(begin: begin, end: end)
+                                            .chain(CurveTween(curve: curve));
+
+                                        return SlideTransition(
+                                          position: animation.drive(tween),
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  addReviewBottomSheet(
+                                    context,
+                                    detailprovider.courseDetailsModel.result?[0].id.toString() ?? "",
+                                  );
+                                }
+                              }
+                            },
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Icon(
+                            Icons.star_border,
+                            color: Colors.white, // Adjust color as needed
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(50),
+                        onTap: () {
+                          AdHelper.showFullscreenAd(
+                            context,
+                            Constant.interstialAdType,
+                            () {
+                              Utils.shareApp(
+                                Platform.isIOS
+                                    ? "Hey! I'm Watching ${detailprovider.courseDetailsModel.result?[0].title.toString()}. Check it out now on ${Constant.appName}! \nhttps://apps.apple.com/us/app/${Constant.appName.toLowerCase()}/${Constant.appPackageName} \n"
+                                    : "Hey! I'm Watching ${detailprovider.courseDetailsModel.result?[0].title.toString()}. Check it out now on ${Constant.appName}! \nhttps://play.google.com/store/apps/details?id=${Constant.appPackageName} \n",
+                              );
+                            },
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Icon(
+                            Icons.share, // Replace with your custom icon if needed
+                            color: Colors.white, // Adjust color as needed
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                /* AdMob Banner */
-                Utils.showBannerAd(context),
-                buildBottonButton(),
-              ],
-            );
-          } else {
-            return const NoData();
-          }
-        }
-      }),
-    );
+                );
+              },
+            ),
+          ],
+        ),
+        body: Consumer<CourseDetailsProvider>(
+          builder: (context, detailprovider, child) {
+            if (detailprovider.loading) {
+              return commanShimmer();
+            } else {
+              if (detailprovider.courseDetailsModel.status == 200) {
+                return Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.all(15),
+                        child: Column(
+                          children: [
+                            parentConainer(),
+                            childContainer(),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Utils.showBannerAd(context),
+                    buildBottonButton(),
+                  ],
+                );
+              } else {
+                return const NoData();
+              }
+            }
+          },
+        ),
+      );
+    }
   }
+
 
   Widget parentConainer() {
     return Column(

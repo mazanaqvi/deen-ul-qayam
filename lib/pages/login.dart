@@ -36,7 +36,7 @@ class LoginState extends State<Login> {
   String? userName;
   File? mProfileImg;
   String? strDeviceType, strDeviceToken;
-  bool showRegisterButton = false; 
+  bool showRegisterButton = true; 
 
 
 

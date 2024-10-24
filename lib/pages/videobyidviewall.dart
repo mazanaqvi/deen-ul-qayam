@@ -1,3 +1,4 @@
+import 'package:yourappname/model/video_api_response.dart';
 import 'package:yourappname/pages/detail.dart';
 import 'package:yourappname/pages/nodata.dart';
 import 'package:yourappname/pages/search.dart';
@@ -8,6 +9,7 @@ import 'package:yourappname/utils/constant.dart';
 import 'package:yourappname/utils/customwidget.dart';
 import 'package:yourappname/utils/dimens.dart';
 import 'package:yourappname/utils/utils.dart';
+import 'package:yourappname/webservice/apiservice.dart';
 import 'package:yourappname/widget/myimage.dart';
 import 'package:yourappname/widget/mynetworkimg.dart';
 import 'package:yourappname/widget/myrating.dart';
@@ -15,6 +17,8 @@ import 'package:yourappname/widget/mytext.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
+import 'package:yourappname/model/lesson_model.dart';
+
 import 'package:yourappname/model/videobyidmodel.dart' as videobyid;
 
 class VideoByIdViewAll extends StatefulWidget {
@@ -28,6 +32,43 @@ class VideoByIdViewAll extends StatefulWidget {
 
   @override
   State<VideoByIdViewAll> createState() => ViewAllState();
+}
+
+class VideoApiProvider extends ChangeNotifier {
+  VideoApiResponse videoApiResponse = VideoApiResponse();
+  List<Lesson>? lessonList = [];
+  bool loading = false;
+  bool loadMore = false;
+
+  /* Fetch Lessons from API */
+  Future<void> getLessons(BuildContext context) async {
+    loading = true;
+    notifyListeners();
+
+    try {
+      final response = await ApiService().getLessonsData();
+      if (response != null && response.code == 0) {
+        videoApiResponse = response;
+        lessonList = response.lessons ?? [];
+      } else {
+        Utils.showSnackbar(context, "error", "Failed to load lessons", true);
+      }
+    } catch (e) {
+      Utils.showSnackbar(context, "error", "Something went wrong", true);
+      print("Error fetching lessons: $e");
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearProvider() {
+    videoApiResponse = VideoApiResponse();
+    lessonList = [];
+    loading = false;
+    loadMore = false;
+    notifyListeners();
+  }
 }
 
 class ViewAllState extends State<VideoByIdViewAll> {
