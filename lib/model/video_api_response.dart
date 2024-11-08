@@ -1,25 +1,18 @@
-import 'lesson_model.dart';
+// lib/model/video_api_response.dart
+import 'package:yourappname/model/lesson_model.dart'; // Add this import
 
 class VideoApiResponse {
-  int? code;
-  List<Lesson>? lessons;
+  final int? code;
+  final List<Lesson>? lessons;
 
   VideoApiResponse({this.code, this.lessons});
 
   factory VideoApiResponse.fromJson(Map<String, dynamic> json) {
-    var list = json['lessons'] as List;
-    List<Lesson> lessonsList = list.map((i) => Lesson.fromJson(i)).toList();
-
     return VideoApiResponse(
       code: json['code'],
-      lessons: lessonsList,
+      lessons: (json['lessons'] as List<dynamic>?)
+          ?.map((e) => Lesson.fromJson(e))
+          .toList(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'code': code,
-      'lessons': lessons?.map((lesson) => lesson.toJson()).toList(),
-    };
   }
 }

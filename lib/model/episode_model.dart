@@ -1,4 +1,6 @@
-class Lesson {
+// lib/model/episode_model.dart
+
+class Episode {
   final String? name;
   final String? audioAddress;
   final String? audioSize;
@@ -7,11 +9,9 @@ class Lesson {
   final String? duration;
   final String? title;
   final String? description;
-  final String? courseName;
-  final String? thumbnail; // Add thumbnail field
-  final String? episodeName; // Add episodeName field
+  final String? thumbnail;
 
-  Lesson({
+  Episode({
     this.name,
     this.audioAddress,
     this.audioSize,
@@ -20,13 +20,11 @@ class Lesson {
     this.duration,
     this.title,
     this.description,
-    this.courseName,
-    this.thumbnail, // Initialize thumbnail
-    this.episodeName, // Initialize episodeName
+    this.thumbnail,
   });
 
-  factory Lesson.fromJson(Map<String, dynamic> json) {
-    return Lesson(
+  factory Episode.fromJson(Map<String, dynamic> json) {
+    return Episode(
       name: json['name'],
       audioAddress: json['audioAddress'],
       audioSize: json['audioSize'],
@@ -35,9 +33,7 @@ class Lesson {
       duration: json['duration'],
       title: json['title'],
       description: json['description'],
-      courseName: json['courseName'],
-      thumbnail: json['thumbnail'], // Add JSON parsing for thumbnail
-      episodeName: json['name'], // Populate episodeName from name
+      thumbnail: json['thumbnail'],
     );
   }
 
@@ -51,13 +47,11 @@ class Lesson {
       'duration': duration,
       'title': title,
       'description': description,
-      'courseName': courseName,
-      'thumbnail': thumbnail, // Include thumbnail in JSON
-      'episodeName': episodeName,
+      'thumbnail': thumbnail,
     };
   }
 
-  Lesson copyWith({
+  Episode copyWith({
     String? name,
     String? audioAddress,
     String? audioSize,
@@ -66,11 +60,9 @@ class Lesson {
     String? duration,
     String? title,
     String? description,
-    String? courseName,
     String? thumbnail,
-    String? episodeName,
   }) {
-    return Lesson(
+    return Episode(
       name: name ?? this.name,
       audioAddress: audioAddress ?? this.audioAddress,
       audioSize: audioSize ?? this.audioSize,
@@ -79,9 +71,7 @@ class Lesson {
       duration: duration ?? this.duration,
       title: title ?? this.title,
       description: description ?? this.description,
-      courseName: courseName ?? this.courseName,
-      thumbnail: thumbnail ?? this.thumbnail, // Add thumbnail to copyWith
-      episodeName: episodeName ?? this.episodeName,
+      thumbnail: thumbnail ?? this.thumbnail,
     );
   }
 }

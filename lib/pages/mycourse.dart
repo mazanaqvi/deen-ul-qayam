@@ -106,7 +106,7 @@ class MyCourseState extends State<MyCourse> {
           controller: _scrollController,
           child: Column(
             children: [
-              buildPage(),
+              // buildPage(),
               buildLessonsSection(), // New method to display lessons
             ],
           ),
@@ -115,74 +115,95 @@ class MyCourseState extends State<MyCourse> {
     );
   }
 
-  Widget buildPage() {
-    return Consumer<MyCourseProvider>(
-        builder: (context, mycourseProvider, child) {
-      if (myCourseProvider.loading && !myCourseProvider.loadMore) {
-        return buildShimmer();
-      } else {
-        if (myCourseProvider.myCourseModel.status == 200 &&
-            myCourseProvider.mycourseList != null) {
-          if ((myCourseProvider.mycourseList?.length ?? 0) > 0) {
-            return Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  mycourselist(),
-                  if (mycourseProvider.loadMore)
-                    Container(
-                      height: 50,
-                      margin: const EdgeInsets.fromLTRB(5, 5, 5, 10),
-                      child: Utils.pageLoader(),
-                    )
-                  else
-                    const SizedBox.shrink(),
-                ],
-              ),
-            );
-          } else {
-            return const NoData();
-          }
-        } else {
-          return const NoData();
-        }
-      }
-    });
-  }
+  // Widget buildPage() {
+  //   return Consumer<MyCourseProvider>(
+  //       builder: (context, mycourseProvider, child) {
+  //     if (myCourseProvider.loading && !myCourseProvider.loadMore) {
+  //       return buildShimmer();
+  //     } else {
+  //       if (myCourseProvider.myCourseModel.status == 200 &&
+  //           myCourseProvider.mycourseList != null) {
+  //         if ((myCourseProvider.mycourseList?.length ?? 0) > 0) {
+  //           return Padding(
+  //             padding: const EdgeInsets.all(15.0),
+  //             child: Column(
+  //               children: [
+  //                 mycourselist(),
+  //                 if (mycourseProvider.loadMore)
+  //                   Container(
+  //                     height: 50,
+  //                     margin: const EdgeInsets.fromLTRB(5, 5, 5, 10),
+  //                     child: Utils.pageLoader(),
+  //                   )
+  //                 else
+  //                   const SizedBox.shrink(),
+  //               ],
+  //             ),
+  //           );
+  //         } else {
+  //           return const NoData();
+  //         }
+  //       } else {
+  //         return const NoData();
+  //       }
+  //     }
+  //   });
+  // }
 
   Widget buildLessonsSection() {
     return Consumer<LessonsProvider>(
       builder: (context, lessonsProvider, child) {
         if (lessonsProvider.loading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (lessonsProvider.lessonsList.isEmpty) {
+        } else if (lessonsProvider.groupedLessons.isEmpty) {
           return const NoData();
         } else {
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: lessonsProvider.lessonsList.length,
-            itemBuilder: (context, index) {
-              final lesson = lessonsProvider.lessonsList[index];
-              print("Navigating to Detail with lesson.name: ${lesson.name}");
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: InkWell(
+          // Extract the list of course names
+          List<String> courseNames =
+              lessonsProvider.groupedLessons.keys.toList();
+
+          return ResponsiveGridList(
+            minItemWidth: 120,
+            minItemsPerRow: 1,
+            maxItemsPerRow: 1,
+            horizontalGridSpacing: 5,
+            verticalGridSpacing: 10,
+            listViewBuilderOptions: ListViewBuilderOptions(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+            ),
+            children: List.generate(
+              courseNames.length,
+              (index) {
+                String courseName = courseNames[index];
+                List<Lesson>? lessons =
+                    lessonsProvider.groupedLessons[courseName];
+
+                // Ensure there is at least one lesson in the course
+                if (lessons == null || lessons.isEmpty) {
+                  return const SizedBox.shrink(); // Or handle appropriately
+                }
+
+                // Select the first lesson for demonstration
+                Lesson lesson = lessons[0];
+
+                return InkWell(
                   onTap: () {
-                    // Display fullscreen ad and navigate to LessonDetail
                     AdHelper.showFullscreenAd(
                       context,
                       Constant.interstialAdType,
                       () {
+                        // Navigate to Detail page, passing the selected lesson
                         Navigator.of(context).push(
                           PageRouteBuilder(
                             pageBuilder: (BuildContext context,
                                 Animation<double> animation,
                                 Animation<double> secondaryAnimation) {
                               return Detail(
-                                courseId: lesson.name ??
-                                    "Unknown", // Use name as courseId
-                                isLesson: true,
+                                courseId: courseName, // Pass the course name
+                                isLesson: true, // Indicate it's a lesson
+                                lesson: lesson, // Pass the Lesson object
                               );
                             },
                             transitionsBuilder: (BuildContext context,
@@ -199,24 +220,55 @@ class MyCourseState extends State<MyCourse> {
                       },
                     );
                   },
-                  child: ListTile(
-                    title: Text(
-                      lesson.name ?? 'No Title',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.0,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(5),
+                                topLeft: Radius.circular(5),
+                              ),
+                              child: MyNetworkImage(
+                                imgWidth: 115,
+                                imgHeight: 100,
+                                imageUrl: lesson.videoAddress ?? "",
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: MyText(
+                                color: Theme.of(context).colorScheme.surface,
+                                text: courseName,
+                                fontsizeNormal: Dimens.textBigSmall,
+                                fontwaight: FontWeight.w600,
+                                maxline: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textalign: TextAlign.left,
+                                fontstyle: FontStyle.normal,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios),
+                      Divider(
+                        color: gray.withOpacity(0.15),
+                        thickness: 0.9,
+                      ),
+                    ],
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         }
       },
     );
   }
+
 
 
   Widget mycourselist() {

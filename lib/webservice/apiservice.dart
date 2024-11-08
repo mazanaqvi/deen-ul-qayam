@@ -746,10 +746,11 @@ Future<VideoApiResponse?> getLessonsData() async {
       },
     );
 
-
     if (response.statusCode == 200) {
       String responseBody = response.body;
 
+      // Log the raw response
+      print("Raw API Response: $responseBody");
       // Check if the response is in PHP array format and needs parsing
       if (responseBody.contains("array")) {
         print("Response is not in JSON format, attempting to parse.");
