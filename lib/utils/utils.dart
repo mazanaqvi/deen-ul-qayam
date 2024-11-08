@@ -2722,6 +2722,8 @@ class Utils {
       ),
     );
   }
+
+  formatBytes(int i) {}
 }
 
 /* ================ Download =================== */

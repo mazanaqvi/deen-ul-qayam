@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:chewie/chewie.dart';
+import 'package:yourappname/pages/mydownloads.dart';
 import 'package:yourappname/pages/tutorprofilepage.dart';
 import 'package:hive/hive.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:yourappname/model/download_item.dart';
 import 'package:yourappname/pages/login.dart';
 import 'package:yourappname/pages/nodata.dart';
@@ -18,6 +19,8 @@ import 'package:yourappname/utils/constant.dart';
 import 'package:yourappname/utils/customwidget.dart';
 import 'package:yourappname/utils/dimens.dart';
 import 'package:yourappname/utils/utils.dart';
+import 'package:yourappname/webservice/apiservice.dart';
+import 'package:yourappname/widget/myimage.dart';
 import 'package:yourappname/widget/mynetworkimg.dart';
 import 'package:yourappname/widget/myrating.dart';
 import 'package:yourappname/widget/mytext.dart';
@@ -27,31 +30,31 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
+import 'package:path/path.dart' as path;
 import 'package:yourappname/model/lesson_model.dart';
 import 'package:video_player/video_player.dart';
 
 class Detail extends StatefulWidget {
-  final Lesson? lesson; // Optional Lesson object
-  final String? courseId;
-  final bool isLesson;
+  final String courseId;
+
+  final bool isLesson; // New parameter
 
   const Detail({
     Key? key,
-    this.lesson, // Not required
-    this.courseId, // Not required
-    this.isLesson = false,
-  })  : assert(!isLesson || (isLesson && lesson != null),
-            'Lesson must be provided when isLesson is true'),
-        super(key: key);
+    required this.courseId,
+    this.isLesson = false, // Default to false
+  }) : super(key: key);
 
   @override
   State<Detail> createState() => _DetailState();
 }
 
 class _DetailState extends State<Detail> {
-  /* Create Instance And Initialize Hive */
+  /* Create Instance And Initilize Hive */
   late Box<DownloadItem> downloadBox;
   late Box<ChapterItem> seasonBox;
   late Box<EpisodeItem> episodeBox;
@@ -61,7 +64,6 @@ class _DetailState extends State<Detail> {
   late ShowDownloadProvider downloadProvider;
   late ScrollController _scrollController;
   late VideoPlayerController _controller;
-  ChewieController? _chewieController; // Make ChewieController nullable
 
   final commentController = TextEditingController();
   double addrating = 0.0;
@@ -69,54 +71,46 @@ class _DetailState extends State<Detail> {
   dynamic _tasks;
   int progress = 0;
 
-  void _videoListener() {
-    if (_controller.value.hasError) {
-      print("Video Player Error: ${_controller.value.errorDescription}");
-    }
-  }
-
   @override
   void initState() {
-    super.initState();
-
-    // Initialize VideoPlayerController with the fixed video URL
-    _controller = VideoPlayerController.network(
-      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    )
-      ..addListener(_videoListener)
-      ..setLooping(true)
-      ..initialize().then((_) {
-        print("Video Player initialized successfully.");
-        setState(() {
-          // Initialize ChewieController after _controller is initialized
-          _chewieController = ChewieController(
-            videoPlayerController: _controller,
-            aspectRatio: _controller.value.aspectRatio,
-            autoPlay: true,
-            looping: true,
-          );
-        });
-        _controller.play();
-      }).catchError((error) {
-        print("Error initializing Video Player: $error");
+    _controller = VideoPlayerController.networkUrl(
+      Uri.parse(
+          'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'),
+    )..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized
+        setState(() {});
       });
+    /* Initilize Hive */
+    if (Constant.userID != null) {
+      downloadBox = Hive.box<DownloadItem>(
+          '${Constant.hiveDownloadBox}_${Constant.userID}');
+      seasonBox = Hive.box<ChapterItem>(
+          '${Constant.hiveSeasonDownloadBox}_${Constant.userID}');
+      episodeBox = Hive.box<EpisodeItem>(
+          '${Constant.hiveEpiDownloadBox}_${Constant.userID}');
+    } else {
+      downloadBox = Hive.box<DownloadItem>(Constant.hiveDownloadBox);
+      seasonBox = Hive.box<ChapterItem>(Constant.hiveSeasonDownloadBox);
+      episodeBox = Hive.box<EpisodeItem>(Constant.hiveEpiDownloadBox);
+    }
 
-    // Initialize Providers, Scroll Controller, Background Isolate, etc.
+    if (!kIsWeb) {
+      /* Download init ****/
+      _bindBackgroundIsolate();
+      FlutterDownloader.registerCallback(downloadCallback, step: 1);
+      /* ****/
+    }
+
     detailProvider = Provider.of<CourseDetailsProvider>(context, listen: false);
     downloadProvider =
         Provider.of<ShowDownloadProvider>(context, listen: false);
+
     lessonsProvider = Provider.of<LessonsProvider>(context, listen: false);
 
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-
-    if (!kIsWeb) {
-      _bindBackgroundIsolate();
-      FlutterDownloader.registerCallback(downloadCallback, step: 1);
-    }
-
+    super.initState();
     getApi();
-
     if (widget.isLesson) {
       fetchLessonDetails();
     } else {
@@ -178,7 +172,7 @@ class _DetailState extends State<Detail> {
     await detailProvider.setVideoLoadMore(false);
   }
 
-  /* ======== Download Start=========== */
+/* ======== Download Start=========== */
 
   void _bindBackgroundIsolate() {
     final isSuccess = IsolateNameServer.registerPortWithName(
@@ -235,31 +229,19 @@ class _DetailState extends State<Detail> {
     }
   }
 
-  /* ======== Download End =========== */
+/* ======== Download End =========== */
 
   @override
   void dispose() {
-    _chewieController?.dispose(); // Dispose ChewieController if not null
-    _controller.removeListener(_videoListener); // Remove the listener
-    _controller.dispose(); // Dispose the controller
     detailProvider.clearProvider();
     downloadProvider.clearProvider();
     lessonsProvider.clearProvider();
-    _unbindBackgroundIsolate();
     super.dispose();
   }
 
-  @override
   Widget build(BuildContext context) {
     if (widget.isLesson) {
-      // Logging in build Method
-      print("===== Building Detail Screen for Lesson =====");
-      print("Lesson Name: ${widget.lesson?.name}");
-      print("Lesson Description: ${widget.lesson?.description}");
-      print("Video URL: ${widget.lesson?.videoAddress}");
-      print("Thumbnail URL: ${widget.lesson?.thumbnail}");
-      print("===============================================");
-
+      // Refactored UI for the lesson to match course UI structure
       return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -267,118 +249,143 @@ class _DetailState extends State<Detail> {
           automaticallyImplyLeading: false,
           leading: InkWell(
             splashColor: Colors.transparent,
-            onTap: () => Navigator.of(context).pop(),
+            onTap: () {
+              Navigator.of(context).pop(false);
+            },
             child: const Padding(
               padding: EdgeInsets.all(5),
               child: Align(
                 alignment: Alignment.center,
-                child: Icon(Icons.arrow_back),
+                child: Icon(Icons.arrow_back), // Customize icon
               ),
             ),
           ),
           actions: [
-            InkWell(
-              splashColor: Colors.transparent,
-              onTap: () async {
-                // Add sharing functionality here
+            Consumer<LessonsProvider>(
+              builder: (context, lessonsProvider, child) {
+                return Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () async {
+                          // Logic for adding/removing lesson from wishlist
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          // child: Icon(
+                          //   // lessonsProvider.lessonDetails?.isWishlist == 1
+                          //       // ? Icons.favorite
+                          //       // : Icons.favorite_border,
+                          //   // color:
+                          //       // lessonsProvider.lessonDetails?.isWishlist == 1
+                          //           // ? Colors.red
+                          //           // : Theme.of(context).colorScheme.surface,
+                          // ),
+                        ),
+                      ),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () async {
+                          // Logic for sharing the lesson details
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Icon(
+                            Icons.share, // Customize icon
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Icon(Icons.share, color: Colors.white),
-              ),
             ),
           ],
         ),
-        body: widget.lesson == null
-            ? const NoData()
-            : SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        body: Consumer<LessonsProvider>(
+          builder: (context, lessonsProvider, child) {
+            if (lessonsProvider.loading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (lessonsProvider.lessonsList.isEmpty) {
+              return const NoData();
+            } else {
+              List<Lesson> matchingLessons = lessonsProvider.lessonsList
+                  .where((lesson) => lesson.name == widget.courseId)
+                  .toList();
+
+              if (matchingLessons.isEmpty) {
+                return const NoData();
+              } else {
+                Lesson lesson = matchingLessons.first;
+
+                return Column(
                   children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: 200, // Set a fixed height
-                          foregroundDecoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.25),
-                              borderRadius: BorderRadius.circular(10)),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: MyNetworkImage(
-                              imgHeight: 200,
-                              fit: BoxFit.fill,
-                              islandscap: true,
-                              imageUrl: widget.lesson!.thumbnail ?? "",
-                            ),
-                          ),
-                        ),
-                        Positioned.fill(
-                          child: InkWell(
-                            splashColor: Colors.transparent,
-                            onTap: () async {
-                              // Add sharing functionality here
-                            },
-                            child: const Align(
-                              alignment: Alignment.center,
-                              child: Icon(Icons.play_arrow_outlined,
-                                  size: 65, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    MyText(
-                      color: Theme.of(context).colorScheme.surface,
-                      text: widget.lesson!.name ?? 'No Name',
-                      fontsizeNormal: Dimens.textBig,
-                      fontwaight: FontWeight.w700,
-                      maxline: 3,
-                      overflow: TextOverflow.ellipsis,
-                      textalign: TextAlign.left,
-                      fontstyle: FontStyle.normal,
-                    ),
-                    const SizedBox(height: 10),
-                    // Video Player within AspectRatio to prevent infinite height
-                    Center(
-                      child: _controller.value.isInitialized &&
-                              _chewieController != null
-                          ? AspectRatio(
-                              aspectRatio: _controller.value.aspectRatio,
-                              child: Chewie(
-                                controller: _chewieController!,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.all(15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Reuse the same UI components as the course UI for consistent design
+                            Text(
+                              lesson.name ?? 'No Name',
+                              style: const TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
                               ),
-                            )
-                          : CircularProgressIndicator(),
-                    ),
-                    const SizedBox(height: 10),
-                    // Play/Pause Button
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            _controller.value.isPlaying
-                                ? Icons.pause
-                                : Icons.play_arrow,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _controller.value.isPlaying
-                                  ? _controller.pause()
-                                  : _controller.play();
-                            });
-                          },
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              lesson.description ?? 'No Description',
+                              style: const TextStyle(fontSize: 16.0),
+                            ),
+                            const SizedBox(height: 20),
+                            _controller.value.isInitialized
+                                ? AspectRatio(
+                                    aspectRatio: _controller.value.aspectRatio,
+                                    child: VideoPlayer(_controller),
+                                  )
+                                : const Center(
+                                    child: CircularProgressIndicator()),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    _controller.value.isPlaying
+                                        ? Icons.pause
+                                        : Icons.play_arrow,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _controller.value.isPlaying
+                                          ? _controller.pause()
+                                          : _controller.play();
+                                    });
+                                  },
+                                ),
+                                const Text("Play/Pause Video"),
+                              ],
+                            ),
+                          ],
                         ),
-                        const Text("Play/Pause Video"),
-                      ],
+                      ),
                     ),
+                    Utils.showBannerAd(context),
+                    // buildBottomButton(), // Implement similar bottom button structure
                   ],
-                ),
-              ),
+                );
+              }
+            }
+          },
+        ),
       );
-    }  else {
+    } else {
       // Existing course detail UI
       return Scaffold(
         appBar: AppBar(
@@ -816,6 +823,60 @@ class _DetailState extends State<Detail> {
             fontstyle: FontStyle.normal),
         // const SizedBox(height: 10),
 
+        // Text between students count and Created By
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.start,
+        //   crossAxisAlignment: CrossAxisAlignment.center,
+        //   children: [
+        //     // MyText(
+        //     //     color: gray,
+        //     //     text: Utils.kmbGenerator(
+        //     //         (detailProvider.courseDetailsModel.result?[0].totalView ??
+        //     //                 0)
+        //     //             .round()),
+        //     //     fontsizeNormal: Dimens.textSmall,
+        //     //     fontwaight: FontWeight.w400,
+        //     //     maxline: 1,
+        //     //     overflow: TextOverflow.ellipsis,
+        //     //     textalign: TextAlign.left,
+        //     //     fontstyle: FontStyle.normal),
+        //     // const SizedBox(width: 5),
+        //     // // MyText(
+        //     //     color: gray,
+        //     //     text: "students",
+        //     //     fontsizeNormal: Dimens.textSmall,
+        //     //     fontwaight: FontWeight.w400,
+        //     //     maxline: 1,
+        //     //     overflow: TextOverflow.ellipsis,
+        //     //     textalign: TextAlign.left,
+        //     //     fontstyle: FontStyle.normal,
+        //     //     multilanguage: true),
+        //   ],
+        // ),
+        // const SizedBox(height: 10),
+        // Course Description
+        // ReadMoreText(
+        //   "${detailProvider.courseDetailsModel.result?[0].description.toString() ?? ""}  ",
+        //   trimLines: 5,
+        //   textAlign: TextAlign.left,
+        //   style: GoogleFonts.montserrat(
+        //       fontSize: Dimens.textSmall,
+        //       fontWeight: FontWeight.w400,
+        //       color: gray),
+        //   trimCollapsedText: 'Read More',
+        //   colorClickableText: black,
+        //   trimMode: TrimMode.Line,
+        //   trimExpandedText: 'Read less',
+        //   lessStyle: GoogleFonts.montserrat(
+        //       fontSize: Dimens.textSmall,
+        //       fontWeight: FontWeight.w600,
+        //       color: black),
+        //   moreStyle: GoogleFonts.montserrat(
+        //       fontSize: Dimens.textSmall,
+        //       fontWeight: FontWeight.w600,
+        //       color: black),
+        // ),
+
         const SizedBox(height: 10),
 
         // Created By List
@@ -1053,6 +1114,63 @@ class _DetailState extends State<Detail> {
       ),
     );
   }
+
+/* Description */
+
+  // Widget description() {
+  //   if (detailProvider.courseDetailsModel.result?[0].description != "") {
+  //     return Column(
+  //       mainAxisAlignment: MainAxisAlignment.start,
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         MyText(
+  //             color: Theme.of(context).colorScheme.surface,
+  //             fontwaight: FontWeight.w600,
+  //             fontsizeNormal: Dimens.textTitle,
+  //             overflow: TextOverflow.ellipsis,
+  //             maxline: 1,
+  //             text: "description",
+  //             textalign: TextAlign.center,
+  //             fontstyle: FontStyle.normal,
+  //             multilanguage: true),
+  //         const SizedBox(height: 10),
+  //         ReadMoreText(
+  //           "${detailProvider.courseDetailsModel.result?[0].description.toString() ?? ""}  ",
+  //           trimLines: 5,
+  //           textAlign: TextAlign.left,
+  //           style: GoogleFonts.montserrat(
+  //               fontSize: Dimens.textSmall,
+  //               fontWeight: FontWeight.w400,
+  //               color: gray),
+  //           trimCollapsedText: 'Read More',
+  //           colorClickableText: colorPrimary,
+  //           trimMode: TrimMode.Line,
+  //           trimExpandedText: 'Read less',
+  //           lessStyle: GoogleFonts.montserrat(
+  //               fontSize: Dimens.textSmall,
+  //               fontWeight: FontWeight.w600,
+  //               color: colorPrimary),
+  //           moreStyle: GoogleFonts.montserrat(
+  //               fontSize: Dimens.textSmall,
+  //               fontWeight: FontWeight.w600,
+  //               color: colorPrimary),
+  //         ),
+  //         // MyText(
+  //         //     color: gray,
+  //         //     fontsizeNormal: Dimens.textSmall,
+  //         //     text: detailProvider.courseDetailsModel.result?[0].description
+  //         //             .toString() ??
+  //         //         "",
+  //         //     maxline: 5,
+  //         //     fontwaight: FontWeight.w400,
+  //         //     textalign: TextAlign.left,
+  //         //     fontstyle: FontStyle.normal),
+  //       ],
+  //     );
+  //   } else {
+  //     return const SizedBox.shrink();
+  //   }
+  // }
 
 /* Related Course */
 
@@ -1623,8 +1741,8 @@ class _DetailState extends State<Detail> {
                                   textalign: TextAlign.left,
                                   fontstyle: FontStyle.normal),
                             ),
-                            // _buildDownloadBtn(
-                            //     position: position, chapterPos: index),
+                            _buildDownloadBtn(
+                                position: position, chapterPos: index),
                             const SizedBox(width: 15),
                             detailProvider.videoList?[position].isRead == 1
                                 ? Container(
@@ -1691,7 +1809,7 @@ class _DetailState extends State<Detail> {
                                   pageBuilder: (context, animation,
                                           secondaryAnimation) =>
                                       Quize(
-                                    courseId: widget.courseId! as int,
+                                    courseId: int.parse(widget.courseId),
                                     chapterId: chapterId,
                                   ),
                                   transitionsBuilder: (context, animation,
@@ -2377,4 +2495,569 @@ class _DetailState extends State<Detail> {
       ),
     );
   }
+
+/* ===========   Generate Certificate (Flutter Downloder) Button With Api Calling Start =============== */
+
+  Widget generateCertificate() {
+    if ((detailProvider.courseDetailsModel.result?[0].isDownloadCertificate ??
+                0) ==
+            1 &&
+        Constant.userID != null) {
+      return InkWell(
+        onTap: () async {
+          getCertificateApiWithDownload();
+        },
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: 45,
+          alignment: Alignment.center,
+          margin: const EdgeInsets.fromLTRB(15, 0, 15, 20),
+          decoration: BoxDecoration(
+            color: colorPrimary,
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              MyText(
+                  color: white,
+                  fontsizeNormal: Dimens.textMedium,
+                  maxline: 1,
+                  fontwaight: FontWeight.w600,
+                  multilanguage: true,
+                  overflow: TextOverflow.ellipsis,
+                  text: "downloadcertificate",
+                  textalign: TextAlign.left,
+                  fontstyle: FontStyle.normal),
+              const SizedBox(width: 8),
+              progress == 0
+                  ? const SizedBox.shrink()
+                  : MyText(
+                      color: white,
+                      fontsizeNormal: Dimens.textMedium,
+                      maxline: 1,
+                      fontwaight: FontWeight.w600,
+                      multilanguage: false,
+                      overflow: TextOverflow.ellipsis,
+                      text: "${detailProvider.dProgress.toString()}%",
+                      textalign: TextAlign.left,
+                      fontstyle: FontStyle.normal),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
+  }
+
+  Future<String> prepareSaveDir() async {
+    String localPath = (await _getSavedDir())!;
+    printLog("localPath ------------> $localPath");
+    final savedDir = Directory(localPath);
+    printLog("savedDir -------------> $savedDir");
+    printLog("is exists ? ----------> ${savedDir.existsSync()}");
+    if (!(await savedDir.exists())) {
+      await savedDir.create(recursive: true);
+    }
+    return localPath;
+  }
+
+  Future<String?> _getSavedDir() async {
+    String? externalStorageDirPath;
+
+    if (Platform.isAndroid) {
+      final directory = await getExternalStorageDirectory();
+      try {
+        externalStorageDirPath = "${directory?.absolute.path}/downloads/";
+      } catch (err, st) {
+        printLog('failed to get downloads path: $err, $st');
+        externalStorageDirPath = "${directory?.absolute.path}/downloads/";
+      }
+    } else if (Platform.isIOS) {
+      externalStorageDirPath =
+          (await getApplicationDocumentsDirectory()).absolute.path;
+    }
+    printLog("externalStorageDirPath ------------> $externalStorageDirPath");
+    return externalStorageDirPath;
+  }
+
+  getCertificateApiWithDownload() async {
+    File? mTargetFile;
+    String? localPath;
+    String? mFileName = '${("certificate")}' '${(widget.courseId)}';
+    try {
+      localPath = await prepareSaveDir();
+      printLog("localPath ====> $localPath");
+      mTargetFile = File(path.join(localPath, '$mFileName.${("pdf")}'));
+    } catch (e) {
+      printLog("saveVideoStorage Exception ===> $e");
+    }
+    printLog("mFileName ========> $mFileName");
+    printLog("mTargetFile ========> $mTargetFile");
+    if (!mounted) return;
+    Utils().showProgress(context, "Generate Certificate...");
+    await detailProvider.fetchCertificate(widget.courseId);
+
+    if (!detailProvider.certificateDownloading) {
+      if (detailProvider.certificateModel.status == 200 &&
+          detailProvider.certificateModel.result != null) {
+        if (!mounted) return;
+        Utils().hideProgress(context);
+        if (mTargetFile != null) {
+          detailProvider.downloadCertificate(
+              detailProvider.certificateModel.result?.pdfUrl ?? "",
+              localPath,
+              mTargetFile);
+          printLog("mTargetFile length ========> ${mTargetFile.length()}");
+        }
+      } else {
+        if (!mounted) return;
+        Utils().hideProgress(context);
+        Utils.showSnackbar(context, "fail", "somethingwentwronge", true);
+      }
+    }
+  }
+
+/* ===========   Generate Certificate (Flutter Downloder) Button With Api Calling End =============== */
+
+/* ============================== Download Chapter Video in Device Start ============================== */
+
+  Widget _buildDownloadBtn({required int position, required int chapterPos}) {
+    if (Constant.userID != null) {
+      if ((detailProvider.courseDetailsModel.result?[0].isFree == 1) ||
+          (detailProvider.courseDetailsModel.result?[0].isFree == 0 &&
+              detailProvider.courseDetailsModel.result?[0].isUserBuy == 1)) {
+        if ((detailProvider.videoList?[position].videoType == "server_video" ||
+            detailProvider.videoList?[position].videoType == "external_url")) {
+          return Consumer2<CourseDetailsProvider, ShowDownloadProvider>(
+            builder: (context, showDetailsProvider, downloadProvider, child) {
+              bool isInDownload = false;
+              if (episodeBox.isOpen && episodeBox.values.toList().isNotEmpty) {
+                List<EpisodeItem> myEpisodeList =
+                    episodeBox.values.where((episodeItem) {
+                  return (episodeItem.id ==
+                          detailProvider.videoList?[position].id &&
+                      episodeItem.courseId ==
+                          detailProvider.videoList?[position].courseId);
+                }).toList();
+                if (myEpisodeList.isNotEmpty) {
+                  isInDownload = (myEpisodeList[0].isDownloaded == 1);
+                }
+              }
+              return Container(
+                alignment: Alignment.center,
+                width: 35,
+                height: 35,
+                margin: const EdgeInsets.only(left: 15),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(5),
+                  focusColor: gray.withOpacity(0.5),
+                  onTap: () async {
+                    printLog("==> dprogress${downloadProvider.dProgress}");
+                    printLog("==> dprogress${downloadProvider.itemId}");
+                    printLog("==> loading=${downloadProvider.loading}");
+                    if (Constant.userID != null) {
+                      if (!isInDownload) {
+                        if ((downloadProvider.dProgress == 0 ||
+                                downloadProvider.dProgress == -1) &&
+                            !downloadProvider.loading &&
+                            (downloadProvider.itemId == null ||
+                                downloadProvider.itemId == 0)) {
+                          _checkAndDownload(
+                              position: position, chapterPos: chapterPos);
+                        } else {
+                          Utils.showSnackbar(
+                              context, "info", "Please Wait", false);
+                        }
+                      } else {
+                        buildDownloadCompleteDialog(
+                            position: position, chapterPos: chapterPos);
+                      }
+                    } else {
+                      await Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const Login(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin = Offset(1.0, 0.0);
+                            const end = Offset.zero;
+                            const curve = Curves.ease;
+
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(3.0),
+                    child: (downloadProvider.dProgress != 0 &&
+                            downloadProvider.dProgress > 0 &&
+                            downloadProvider.dProgress < 100 &&
+                            !isInDownload &&
+                            (downloadProvider.itemId ==
+                                detailProvider.videoList?[position].id))
+                        ? Container(
+                            alignment: Alignment.center,
+                            child: CircularPercentIndicator(
+                              radius: (Dimens.featureIconSize / 2),
+                              lineWidth: 2.0,
+                              percent:
+                                  (downloadProvider.dProgress / 100).toDouble(),
+                              progressColor: colorPrimary,
+                            ),
+                          )
+                        : Container(
+                            alignment: Alignment.center,
+                            child: Icon(
+                              isInDownload
+                                  ? Icons.download_done
+                                  : Icons.download,
+                              size: 24,
+                              color: colorPrimary,
+                            ),
+                          ),
+                  ),
+                ),
+              );
+            },
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      } else {
+        return const SizedBox.shrink();
+      }
+    } else {
+      return const SizedBox.shrink();
+    }
+  }
+
+  _checkAndDownload({required int position, required int chapterPos}) async {
+    WidgetsFlutterBinding.ensureInitialized();
+    // if (!connectivityProvider.isOnline) {
+    //   Utils.showSnackbar(context, "fail", "no_internet", true);
+    //   return;
+    // }
+    printLog(
+        "video320 ----------> ${detailProvider.videoList?[position].videoUrl}");
+    if ((detailProvider.videoList?[position].videoUrl ?? "").isNotEmpty) {
+      printLog("episode Length ----> ${detailProvider.videoList?.length}");
+      if (!mounted) return;
+      prepareShowDownload(
+        context,
+        contentDetails: detailProvider.courseDetailsModel.result?[0],
+        seasonPos: chapterPos,
+        episodePos: position,
+        episodeDetails: detailProvider.videoList?[position],
+      );
+    } else {
+      if (!mounted) return;
+      Utils.showSnackbar(context, "fail", "invalid_url", true);
+    }
+  }
+
+  buildDownloadCompleteDialog(
+      {required int position, required int chapterPos}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(0)),
+      ),
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(23),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  MyText(
+                    text: "download_options",
+                    multilanguage: true,
+                    fontsizeNormal: Dimens.textTitle,
+                    fontsizeWeb: Dimens.textTitle,
+                    color: Theme.of(context).colorScheme.surface,
+                    fontstyle: FontStyle.normal,
+                    fontwaight: FontWeight.w700,
+                    maxline: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textalign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 5),
+                  MyText(
+                    text: "download_options_note",
+                    multilanguage: true,
+                    fontsizeNormal: Dimens.textSmall,
+                    fontsizeWeb: Dimens.textSmall,
+                    color: Theme.of(context).colorScheme.surface,
+                    fontstyle: FontStyle.normal,
+                    fontwaight: FontWeight.w500,
+                    maxline: 5,
+                    overflow: TextOverflow.ellipsis,
+                    textalign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 12),
+
+                  /* To Download */
+                  InkWell(
+                    borderRadius: BorderRadius.circular(5),
+                    focusColor: white,
+                    onTap: () async {
+                      Navigator.pop(context);
+                      if (Constant.userID != null) {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const MyDownloads(),
+                          ),
+                        );
+                        setState(() {});
+                      } else {
+                        await Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    const Login(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const begin = Offset(1.0, 0.0);
+                              const end = Offset.zero;
+                              const curve = Curves.ease;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      height: Dimens.minHtDialogContent,
+                      padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          MyImage(
+                            width: Dimens.dialogIconSize,
+                            height: Dimens.dialogIconSize,
+                            imagePath: "ic_setting.png",
+                            fit: BoxFit.fill,
+                            color: gray,
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: MyText(
+                              text: "take_me_to_the_downloads_page",
+                              multilanguage: true,
+                              fontsizeNormal: 14,
+                              color: Theme.of(context).colorScheme.surface,
+                              fontstyle: FontStyle.normal,
+                              fontwaight: FontWeight.w600,
+                              maxline: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textalign: TextAlign.start,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  /* Delete */
+                  InkWell(
+                    borderRadius: BorderRadius.circular(5),
+                    focusColor: white,
+                    onTap: () async {
+                      Navigator.pop(context);
+                      deleteFromDownloads(position, chapterPos);
+                    },
+                    child: Container(
+                      height: Dimens.minHtDialogContent,
+                      padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          MyImage(
+                            width: Dimens.dialogIconSize,
+                            height: Dimens.dialogIconSize,
+                            imagePath: "ic_delete.png",
+                            fit: BoxFit.fill,
+                            color: gray,
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: MyText(
+                              text: "delete_download",
+                              multilanguage: true,
+                              fontsizeNormal: 14,
+                              color: Theme.of(context).colorScheme.surface,
+                              fontstyle: FontStyle.normal,
+                              fontwaight: FontWeight.w600,
+                              maxline: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textalign: TextAlign.start,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> deleteFromDownloads(position, chapterPos) async {
+    printLog("deleteFromDownloads pos ===> $position");
+    printLog("deleteFromDownloads id ====> ${downloadBox.get(position)?.id}");
+    if (!mounted) return;
+    /* Remove from Hive START ***************** */
+    printLog(
+        "downloadBox length :======> ${downloadBox.values.toList().length}");
+    printLog("seasonBox length :========> ${seasonBox.values.toList().length}");
+    printLog(
+        "episodeBox length :=======> ${episodeBox.values.toList().length}");
+
+    /* Episode Delete */
+    for (int i = 0; i < episodeBox.values.toList().length; i++) {
+      final myEpisodeData = episodeBox.getAt(i);
+      printLog("myEpisodeData ====> ${myEpisodeData != null}");
+      if (myEpisodeData != null &&
+          myEpisodeData.id == detailProvider.videoList?[position].id &&
+          myEpisodeData.courseId ==
+              detailProvider.courseDetailsModel.result?[0].id) {
+        printLog(
+            "myDownloadsList showId ====> ${detailProvider.courseDetailsModel.result?[0].id}");
+        printLog("myEpisodeData showId ======> ${myEpisodeData.courseId}");
+        if (myEpisodeData.savedFile != null && myEpisodeData.savedFile != "") {
+          try {
+            File filePath = File(myEpisodeData.savedFile ?? "");
+            File filePortImgPath = File(myEpisodeData.thumbnailImg ?? "");
+            File fileLandImgPath = File(myEpisodeData.landscapeImg ?? "");
+            printLog("myEpisodeData filePath =============> $filePath");
+            printLog("myEpisodeData filePortImgPath ======> $filePortImgPath");
+            printLog("myEpisodeData fileLandImgPath ======> $fileLandImgPath");
+            bool? isFileExists = await filePath.exists();
+            bool? isPortImgFileExists = await filePortImgPath.exists();
+            bool? isLandImgFileExists = await fileLandImgPath.exists();
+            printLog("myEpisodeData isFileExists =========> $isFileExists");
+            printLog(
+                "myEpisodeData isPortImgFileExists ==> $isPortImgFileExists");
+            printLog(
+                "myEpisodeData isLandImgFileExists ==> $isLandImgFileExists");
+            if (isFileExists) {
+              await filePath.delete();
+            }
+            if (isPortImgFileExists) {
+              await filePortImgPath.delete();
+            }
+            if (isLandImgFileExists) {
+              await fileLandImgPath.delete();
+            }
+          } on Exception catch (exception) {
+            printLog("Episode DeleteFile Exception ==> $exception");
+          }
+        }
+        await episodeBox.deleteAt(i);
+        if (episodeBox.isEmpty) {
+          episodeBox.clear();
+          if ((myEpisodeData.savedDir ?? "").isNotEmpty) {
+            try {
+              String dirPath = myEpisodeData.savedDir ?? "";
+              printLog("dirPath ==> $dirPath");
+              File dirFolder = File(dirPath);
+              printLog("File existsSync ==> ${dirFolder.existsSync()}");
+              dirFolder.deleteSync(recursive: true);
+            } on Exception catch (exception) {
+              printLog("Episode Delete Exception ==> $exception");
+            }
+          }
+        }
+      }
+    }
+    if (episodeBox.values.toList().isEmpty) {
+      episodeBox.clear();
+
+      /* Season Delete */
+      for (int i = 0; i < seasonBox.values.toList().length; i++) {
+        final mySeasonData = seasonBox.getAt(i);
+        if (mySeasonData != null &&
+            mySeasonData.id ==
+                detailProvider
+                    .courseDetailsModel.result?[0].chapter?[chapterPos].id &&
+            mySeasonData.courseId ==
+                detailProvider.courseDetailsModel.result?[0].id) {
+          printLog(
+              "myDownloadsList showId ====> ${detailProvider.courseDetailsModel.result?[0].id}");
+          printLog("mySeasonData showId =======> ${mySeasonData.courseId}");
+          await seasonBox.deleteAt(i);
+        }
+      }
+      if (seasonBox.values.toList().isEmpty) {
+        seasonBox.clear();
+      }
+    }
+    printLog("episodeBox length :=======> ${episodeBox.length}");
+    printLog(
+        "episodeBox length :=======> ${episodeBox.values.toList().length}");
+    printLog("seasonBox length :========> ${seasonBox.values.toList().length}");
+    if (downloadBox.values.toList().isNotEmpty &&
+        (episodeBox.values.toList().isEmpty || episodeBox.isEmpty)) {
+      /* Video/Show Delete */
+      for (int i = 0; i < downloadBox.values.toList().length; i++) {
+        final myDownloadData = downloadBox.getAt(i);
+        if (myDownloadData != null &&
+            myDownloadData.id ==
+                detailProvider.courseDetailsModel.result?[0].id) {
+          await downloadBox.deleteAt(i);
+          if (downloadBox.isEmpty) {
+            downloadBox.clear();
+            if ((myDownloadData.savedDir ?? "").isNotEmpty) {
+              try {
+                String dirPath = myDownloadData.savedDir ?? "";
+                printLog("dirPath ==> $dirPath");
+                File dirFolder = File(dirPath);
+                printLog("File existsSync ==> ${dirFolder.existsSync()}");
+                dirFolder.deleteSync(recursive: true);
+              } on Exception catch (exception) {
+                printLog("All Delete Exception ==> $exception");
+              }
+            }
+          }
+        }
+      }
+      printLog("downloadBox length :======> ${downloadBox.length}");
+      if (downloadBox.values.toList().isEmpty) {
+        downloadBox.clear();
+      }
+    }
+    await downloadProvider.notifyProvider();
+    /* ******************* Remove from Hive END */
+  }
+
+/* ============================== Download Chapter Video in Device End ============================== */
 }

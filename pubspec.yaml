@@ -50,6 +50,7 @@ dependencies:
   country_codes: ^3.1.0+2
   dio: ^5.5.0+1
   provider: ^6.1.2
+  logger: ^2.4.0
   pretty_dio_logger: ^1.4.0
   progress_dialog_null_safe: ^3.0.0
   firebase_auth: ^4.20.0
@@ -122,6 +123,7 @@ dependencies:
   hive_flutter: ^1.1.0
   encrypt: ^5.0.3
   flutter_launcher_icons: ^0.13.1
+  audioplayers: ^6.1.0
 
 dependency_overrides:
   intl: any

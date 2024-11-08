@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:yourappname/provider/videobyidviewallprovider.dart';
+import 'package:yourappname/provider/lessonsprovider.dart';
+
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yourappname/firebase_options.dart';
@@ -102,6 +104,8 @@ Future<void> main() async {
           ChangeNotifierProvider(create: (_) => ShowDownloadProvider()),
           ChangeNotifierProvider(create: (_) => VideoDownloadProvider()),
           ChangeNotifierProvider(create: (_) => VideoByIdViewAllProvider()),
+          ChangeNotifierProvider(
+              create: (_) => LessonsProvider()), // New provider added
         ],
         child: const MyApp(),
       ),

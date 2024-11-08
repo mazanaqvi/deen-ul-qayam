@@ -31,7 +31,7 @@ class BottombarState extends State<Bottombar> {
   SharedPre sharedpre = SharedPre();
   late GeneralProvider generalProvider;
   late ProfileProvider profileProvider;
-  int selectedIndex = 2;
+  int selectedIndex = 0;
   String userid = "";
   String currencycode = "";
 
@@ -86,8 +86,8 @@ class BottombarState extends State<Bottombar> {
   }
 
   List<Widget> _children() => [
-        const Home(),
-        const Expore(),
+        // const Home(),
+        // const Expore(),
         const MyCourse(),
         const Ebook(),
         const Account(),
@@ -153,17 +153,17 @@ class BottombarState extends State<Bottombar> {
             bottomNavigationItem(
                 icon: "ic_mycourses.png",
                 title: Locales.string(context, "mycourse"),
-                index: 2,
+                index: 0,
                 selectedIndex: selectedIndex),
             bottomNavigationItem(
                 icon: "ic_ebook.png",
                 title: Locales.string(context, "ebook"),
-                index: 3,
+                index: 1,
                 selectedIndex: selectedIndex),
             bottomNavigationItem(
                 icon: "ic_bottomNavAccount.png",
                 title: Locales.string(context, "setting"),
-                index: 4,
+                index: 2,
                 selectedIndex: selectedIndex),
           ],
         ),

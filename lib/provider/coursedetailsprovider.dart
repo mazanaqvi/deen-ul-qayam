@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:yourappname/model/SuccessModel.dart';
 import 'package:yourappname/model/certificatemodel.dart';
@@ -8,11 +9,13 @@ import 'package:yourappname/model/getvideobychapter.dart' as video;
 import 'package:yourappname/model/getvideobychapter.dart';
 import 'package:yourappname/model/relatedcoursemodel.dart' as related;
 import 'package:yourappname/model/relatedcoursemodel.dart';
+import 'package:yourappname/model/video_api_response.dart';
 import 'package:yourappname/utils/utils.dart';
 import 'package:yourappname/webservice/apiservice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart';
+
 
 class CourseDetailsProvider extends ChangeNotifier {
   /* Course Detail Field */

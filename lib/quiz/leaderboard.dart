@@ -1,6 +1,6 @@
 import 'package:yourappname/provider/coursedetailsprovider.dart';
 import 'package:yourappname/provider/quizeprovider.dart';
-import 'package:yourappname/quize/quize.dart';
+import 'package:yourappname/quiz/quiz.dart';
 import 'package:yourappname/utils/color.dart';
 import 'package:yourappname/utils/dimens.dart';
 import 'package:yourappname/utils/utils.dart';
